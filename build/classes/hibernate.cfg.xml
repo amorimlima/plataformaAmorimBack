@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		
+		 
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/temp</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password"></property>
+		
+		<property name="hibernate.cache.use_second_level_cache">true</property>
+				
+		<property name="hibernate.c3p0.min_size">10</property>
+		<property name="hibernate.c3p0.max_size">50</property>
+		<property name="hibernate.c3p0.timeout">3000</property>
+		<property name="hibernate.c3p0.max_statements">500</property>
+		<property name="hibernate.c3p0.idle_test_period">30000</property>
+	
+		
+		<!--<property name="hibernate.hbm2ddl.auto">update</property>
+		
+		<property name="show_sql">true</property> 
+		<property name="hibernate.hbm2ddl.auto">update</property>
+		<property name="hibernate.connection.username">amorim_dev</property>
+		<property name="hibernate.connection.password">amorim_dev</property>
+		<property name="hibernate.connection.username">amorim_prodV2</property>
+		<property name="hibernate.connection.password">amorim_prodV2</property>
+		
+		 -->
+		<!--  
+		
+		amorim_prodx
+		amorim_prod
+		amorim_prod_teste
+		
+		<property name="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</property>
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory </property>
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property> 
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+		<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+		<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property> 
+		<mapping resource="grupo.hbm.xml"/>
+		-->
+		
+		<mapping class="br.com.muranodesign.model.Acoes" />
+		<mapping class="br.com.muranodesign.model.Aluno" />
+		<mapping class="br.com.muranodesign.model.AlunoVariavel" />
+		<mapping class="br.com.muranodesign.model.AnoEstudo" />
+		<mapping class="br.com.muranodesign.model.AnoLetivo" />
+		<mapping class="br.com.muranodesign.model.Atividade" />
+		<mapping class="br.com.muranodesign.model.AtribuicaoRoteiroExtra" />
+		<mapping class="br.com.muranodesign.model.AvaliacaoProducaoAluno" />
+		<mapping class="br.com.muranodesign.model.Calendario" />
+		<mapping class="br.com.muranodesign.model.CalendarioEventos" />
+		<mapping class="br.com.muranodesign.model.CategoriaProducaoAluno" />
+		<mapping class="br.com.muranodesign.model.Chamada" />
+		<mapping class="br.com.muranodesign.model.FichaFinalizacaoQuestao" />
+		<mapping class="br.com.muranodesign.model.FichaFinalizacaoResposta" />
+		<mapping class="br.com.muranodesign.model.ForumQuestao" />
+		<mapping class="br.com.muranodesign.model.ForumResposta" />
+		<mapping class="br.com.muranodesign.model.Grupo" />
+		<mapping class="br.com.muranodesign.model.Materia" />
+		<mapping class="br.com.muranodesign.model.Mensagens" />
+		<mapping class="br.com.muranodesign.model.Objetivo" />
+		<mapping class="br.com.muranodesign.model.Perfil" />
+		
+		<mapping class="br.com.muranodesign.model.Periodo" />
+		<mapping class="br.com.muranodesign.model.PlanejamentoRoteiro" />
+		<mapping class="br.com.muranodesign.model.PlanoEstudo" />
+		<mapping class="br.com.muranodesign.model.PresencaProfessor" />
+		<mapping class="br.com.muranodesign.model.ProducaoAluno" />
+		<mapping class="br.com.muranodesign.model.ProfessorFuncionario" />
+		<mapping class="br.com.muranodesign.model.ProfessorFuncionarioVariavel" />
+		<mapping class="br.com.muranodesign.model.RecursoAprendizagem" />
+		<mapping class="br.com.muranodesign.model.RegistroDiario" />
+		<mapping class="br.com.muranodesign.model.RelatorioAluno" />
+		<mapping class="br.com.muranodesign.model.RelatorioTutoria" />
+		<mapping class="br.com.muranodesign.model.Roteiro" />
+		<mapping class="br.com.muranodesign.model.TipoEvento" />
+		<mapping class="br.com.muranodesign.model.TipoProducaoAluno" />
+		<mapping class="br.com.muranodesign.model.TipoRecursoAprendizagem" />
+		<mapping class="br.com.muranodesign.model.Tutoria" />
+		<mapping class="br.com.muranodesign.model.Usuario" />
+		
+		
+		
+		<mapping class="br.com.muranodesign.model.Historico_conexao" />
+		<mapping class="br.com.muranodesign.model.SO" />
+		<mapping class="br.com.muranodesign.model.FichaInscricao" />
+		<mapping class="br.com.muranodesign.model.SessaoForumGeral"/>
+		<mapping class="br.com.muranodesign.model.ForumGeralQuestao"/>
+		<mapping class="br.com.muranodesign.model.ForumGeralResposta"/>
+		<mapping class="br.com.muranodesign.model.Imagens" />
+		<mapping class="br.com.muranodesign.model.historicoEventos" />
+		<mapping class="br.com.muranodesign.model.Template" />
+		<mapping class="br.com.muranodesign.model.ComunicadoOficinas" />
+		<mapping class="br.com.muranodesign.model.AgendamentoSala" />
+		<mapping class="br.com.muranodesign.model.Agrupamento" />
+		<mapping class="br.com.muranodesign.model.AlunoAgrupamento" />
+		<mapping class="br.com.muranodesign.model.Oficina" />
+		<mapping class="br.com.muranodesign.model.OficinaProfessor" />
+		
+		<mapping class="br.com.muranodesign.model.Rotina" />
+		<mapping class="br.com.muranodesign.model.Salas" />
+		<mapping class="br.com.muranodesign.model.Semana" />
+		<mapping class="br.com.muranodesign.model.Ciclos" />
+		<mapping class="br.com.muranodesign.model.CicloAnoEstudo" />
+		<mapping class="br.com.muranodesign.model.Mural" />
+		<mapping class="br.com.muranodesign.model.MuralAluno" />
+		<mapping class="br.com.muranodesign.model.Cores" />
+		<mapping class="br.com.muranodesign.model.RoteiroAula" />
+		<mapping class="br.com.muranodesign.model.ObjetivoAula" />
+		<mapping class="br.com.muranodesign.model.Menu" />
+		<mapping class="br.com.muranodesign.model.MenuPerfil" />
+		<mapping class="br.com.muranodesign.model.Blog" />
+		<mapping class="br.com.muranodesign.model.PlanoAula" />
+		<mapping class="br.com.muranodesign.model.PlanejamentoAula" />
+		<mapping class="br.com.muranodesign.model.JornadaProfessor" />
+		<mapping class="br.com.muranodesign.model.MuralCoordenacao" />
+		<mapping class="br.com.muranodesign.model.PendenciasProducaoAluno" />
+		
+		
+	</session-factory>
+</hibernate-configuration>

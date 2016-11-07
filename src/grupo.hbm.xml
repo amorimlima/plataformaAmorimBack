@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>  
+<!DOCTYPE hibernate-mapping PUBLIC  
+          "-//Hibernate/Hibernate Mapping DTD 3.0//EN"  
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="br.com.muranodesign.model.Grupo" table="grupo">
+		<cache usage="read-only"/>
+		<id name="idgrupo">
+			<generator class="native"></generator>
+		</id>
+		<property name="nomeGrupo" column="nome_grupo" type="string"></property>
+		
+		<property name="tutoria" column="tutoria" type="string"></property>
+		<property name="lider" column="lider" type="string"></property>
+		
+	</class>
+</hibernate-mapping>
