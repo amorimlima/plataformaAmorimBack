@@ -194,4 +194,14 @@ public class TutoriaService {
 		pc.commitAndClose();
 		return result;
 	}
+
+	public List<Tutoria> listarTodasAnos() {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		TutoriaDAO dao = DAOFactory.getTutoriaDAO(pc);
+		List<Tutoria> result = dao.listarTodasAnos();
+				
+		pc.commitAndClose();
+		return result;
+	}
+
 }
