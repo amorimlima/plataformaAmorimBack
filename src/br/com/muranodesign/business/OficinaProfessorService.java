@@ -6,6 +6,7 @@ import br.com.muranodesign.dao.DAOFactory;
 import br.com.muranodesign.dao.OficinaProfessorDAO;
 import br.com.muranodesign.hibernate.impl.PersistenceContext;
 import br.com.muranodesign.model.OficinaProfessor;
+import br.com.muranodesign.resources.ProfessorFuncionario;
 
 public class OficinaProfessorService {
 	
@@ -109,6 +110,31 @@ public class OficinaProfessorService {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		OficinaProfessorDAO dao = DAOFactory.getOficinaProfessorDAO(pc);
 		List<OficinaProfessor> result = dao.listarPorOficina(idOficina);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<ProfessorFuncionario> listarOficineiros() {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		OficinaProfessorDAO dao = DAOFactory.getOficinaProfessorDAO(pc);
+		List<ProfessorFuncionario> result = dao.listarOficinerios();
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<ProfessorFuncionario> listarProfessoresPorOficina(int idOficina) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		OficinaProfessorDAO dao = DAOFactory.getOficinaProfessorDAO(pc);
+		List<ProfessorFuncionario> result = dao.listarProfessoresPorOficina(idOficina);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<OficinaProfessor> listarOficinaProfessor(int idOficina,
+			int idProfessor) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		OficinaProfessorDAO dao = DAOFactory.getOficinaProfessorDAO(pc);
+		List<OficinaProfessor> result = dao.listarOficinaProfessor(idOficina, idProfessor);
 		pc.commitAndClose();
 		return result;
 	}
