@@ -165,5 +165,13 @@ public class UsuarioService {
 		return id;
 	}
 
+	public List<Usuario> listarPerfil(int idPerfil) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		UsuarioDAO dao = DAOFactory.getUsuarioDAO(pc);
+		List<Usuario> result = dao.listarPerfil(idPerfil);
+		pc.commitAndClose();
+		return result;
+	}
+
 	
 }
