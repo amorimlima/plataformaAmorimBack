@@ -88,7 +88,11 @@ public interface ObjetivoDAO {
 		 * @param id
 		 * @return
 		 */
-		public List<Objetivo> listarGraficoEntregues(int id); 
+		public List<Objetivo> listarGraficoEntregues(int id);
+
+		public float countObjetivosAnoProfessor(int idprofessorFuncionario);
+
+		public float countObjetivosAtribuicaoTutoria(int idTutoria); 
 		 
 
 }

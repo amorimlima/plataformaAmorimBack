@@ -78,4 +78,8 @@ public interface OficinaDAO {
 	 * @return
 	 */
 	public List<Oficina> listarLazyNome(int id);
+
+	public long contTipo(int tipo);
+
+	public int deletarOficinaSemProfessor();
 }

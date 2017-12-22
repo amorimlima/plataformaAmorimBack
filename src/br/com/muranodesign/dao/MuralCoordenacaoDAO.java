@@ -16,4 +16,8 @@ public interface MuralCoordenacaoDAO {
 
 	void deletar(MuralCoordenacao p);
 
+	List<MuralCoordenacao> listarProfessor(int idProfessor);
+
+	List<MuralCoordenacao> listarPerfil(int perfil);
+
 }

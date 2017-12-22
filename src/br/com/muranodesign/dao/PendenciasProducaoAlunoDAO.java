@@ -18,6 +18,10 @@ public interface PendenciasProducaoAlunoDAO {
 
 	List<PendenciasProducaoAluno> listarAluno(int id);
 
-	List<PendenciasProducaoAluno> listarAlunoRoteiro(int idaluno, int idroteiro);
+	public List<PendenciasProducaoAluno> listarAlunoRoteiro(int idaluno, int idroteiro);
+	
+	List<PendenciasProducaoAluno> listarAlunoRoteiroAno(int idAluno, int idRoteiro, String ano);
+
+	List<PendenciasProducaoAluno> listarAlunoAnoAnterior(int id);
 
 }
