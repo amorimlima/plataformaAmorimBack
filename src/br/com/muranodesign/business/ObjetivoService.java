@@ -32,7 +32,7 @@ public class ObjetivoService {
 	public List<Objetivo> listarTodos() {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		ObjetivoDAO dao = DAOFactory.getObjetivoDAO(pc);
-		List<Objetivo> result = dao.listAllTeste();
+		List<Objetivo> result = dao.listAll();
 				
 		pc.commitAndClose();
 		return result;
@@ -160,5 +160,21 @@ public class ObjetivoService {
 		dao.atualizar(p);
 		pc.commitAndClose();
 		return p;
+	}
+
+	public float countObjetivosAnoProfessor(int idprofessorFuncionario) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ObjetivoDAO dao = DAOFactory.getObjetivoDAO(pc);
+		float result = dao.countObjetivosAnoProfessor(idprofessorFuncionario);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public float countObjetivosAtribuicaoTutoria(int idTutoria) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ObjetivoDAO dao = DAOFactory.getObjetivoDAO(pc);
+		float result = dao.countObjetivosAtribuicaoTutoria(idTutoria);
+		pc.commitAndClose();
+		return result;
 	}	
 }
