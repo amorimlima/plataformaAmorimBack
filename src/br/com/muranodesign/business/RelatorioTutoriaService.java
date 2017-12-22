@@ -9,6 +9,7 @@
  */
 package br.com.muranodesign.business;
 
+import java.util.Date;
 import java.util.List;
 
 import br.com.muranodesign.dao.DAOFactory;
@@ -107,6 +108,24 @@ public class RelatorioTutoriaService {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		RelatorioTutoriaDAO dao = DAOFactory.getRelatorioTutoriaDAO(pc);
 		List<RelatorioTutoria> result = dao.listarTutoriaAluno(tutoria, aluno);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<RelatorioTutoria> listarTutoriaAlunoAno(int tutoria, int aluno,
+			int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RelatorioTutoriaDAO dao = DAOFactory.getRelatorioTutoriaDAO(pc);
+		List<RelatorioTutoria> result = dao.listarTutoriaAlunoAno(tutoria, aluno, ano);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<RelatorioTutoria> getRelatorioData(Date inicio,
+			Date fim, int idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RelatorioTutoriaDAO dao = DAOFactory.getRelatorioTutoriaDAO(pc);
+		List<RelatorioTutoria> result = dao.getRelatorioData(inicio, fim, idAluno);
 		pc.commitAndClose();
 		return result;
 	}
