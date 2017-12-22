@@ -174,4 +174,12 @@ public class ProducaoAlunoService {
 		pc.commitAndClose();
 		return result;
 	}
+
+	public List<ProducaoAluno> listarUltimasAluno(int idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ProducaoAlunoDAO dao = DAOFactory.getProducaoAlunoDAO(pc);
+		List<ProducaoAluno> result = dao.listaUltimasAluno(idAluno);
+		pc.commitAndClose();
+		return result;
+	}
 }
