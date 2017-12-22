@@ -9,13 +9,18 @@
  */
 package br.com.muranodesign.util;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
+
 import org.apache.log4j.Logger;
+//Teste
 
 
 /**
@@ -41,8 +46,7 @@ public class Upload {
 			String uploadedFileLocation) {
 	 
 			try {
-				OutputStream out = new FileOutputStream(new File(
-						uploadedFileLocation));
+				OutputStream out;
 				int read = 0;
 				byte[] bytes = new byte[1024];
 	 
@@ -52,6 +56,14 @@ public class Upload {
 				}
 				out.flush();
 				out.close();
+				
+//				BufferedImage image = ImageIO.read(uploadedInputStream);
+//				
+//				int extensionStart = uploadedFileLocation.lastIndexOf('.');
+//				String extension = uploadedFileLocation.substring(extensionStart + 1);
+//				
+//				ImageIO.write(image, extension, new File(uploadedFileLocation));
+				
 			} catch (IOException e) {
 	 
 				logger.warn("Erro de:  "+e);
@@ -60,4 +72,39 @@ public class Upload {
 			}
 	 
 		}
+	
+	public void resizeAndWriteToFile (File uploadedInputStream,
+			String uploadedFileLocation, int maxSize) throws Exception{
+		
+		BufferedImage image = ImageIO.read(uploadedInputStream);
+		int width          = image.getWidth();
+		int height         = image.getHeight();
+		int format = (image.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : image.getType());
+
+		
+		if (width > maxSize)
+		{
+			image = resizeImage(image, format, maxSize, maxSize * height/width); 
+		}
+		
+		int extensionStart = uploadedInputStream.toString().lastIndexOf('.');
+		String extension = uploadedInputStream.toString().substring(extensionStart + 1);
+		
+		ImageIO.write(image, extension, new File(uploadedFileLocation));
+		
+	}
+	
+	private static BufferedImage resizeImage(BufferedImage image, int format, int width, int height) {
+	    BufferedImage resizedImage = new BufferedImage(width, height, format);
+	    Graphics2D graphics = resizedImage.createGraphics();
+	    graphics.drawImage(image, 0, 0, width, height, null);
+	    graphics.dispose();
+
+	    return resizedImage;
+	}
+	
+	public void deleteFile(String filePath){
+		new File(filePath).delete();
+	}
 }
+
