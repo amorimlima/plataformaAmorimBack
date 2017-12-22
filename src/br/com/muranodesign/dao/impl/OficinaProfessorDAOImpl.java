@@ -3,12 +3,14 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.OficinaProfessorDAO;
 import br.com.muranodesign.hibernate.AbstractHibernateDAO;
 import br.com.muranodesign.hibernate.HibernatePersistenceContext;
 import br.com.muranodesign.model.OficinaProfessor;
+import br.com.muranodesign.resources.ProfessorFuncionario;
 
 public class OficinaProfessorDAOImpl extends AbstractHibernateDAO implements OficinaProfessorDAO{
 	
@@ -110,6 +112,40 @@ public class OficinaProfessorDAOImpl extends AbstractHibernateDAO implements Ofi
 	public List<OficinaProfessor> listarPorOficina(int idOficina){
 		Criteria criteria = getSession().createCriteria(OficinaProfessor.class);
 		
+		criteria.createAlias("oficina", "oficina");
+		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
+		List<OficinaProfessor> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProfessorFuncionario> listarOficinerios() {
+		Criteria criteria = getSession().createCriteria(OficinaProfessor.class);
+		
+		criteria.setProjection(Projections.distinct(Projections.property("professor")));
+		
+		List<ProfessorFuncionario> result = criteria.list();
+		
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProfessorFuncionario> listarProfessoresPorOficina(int idOficina) {
+		Criteria criteria = getSession().createCriteria(OficinaProfessor.class);
+		criteria.createAlias("oficina", "oficina");
+		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
+		criteria.setProjection(Projections.property("professor"));
+		List<ProfessorFuncionario> result = criteria.list();
+		
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<OficinaProfessor> listarOficinaProfessor(int idOficina, int idProfessor){
+		Criteria criteria = getSession().createCriteria(OficinaProfessor.class);
+		
+		criteria.createAlias("professor", "professor");
+		criteria.add(Restrictions.eq("professor.idprofessorFuncionario", idProfessor));
 		criteria.createAlias("oficina", "oficina");
 		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
 		List<OficinaProfessor> result = criteria.list();

@@ -3,11 +3,14 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.RotinaDAO;
 import br.com.muranodesign.hibernate.AbstractHibernateDAO;
 import br.com.muranodesign.hibernate.HibernatePersistenceContext;
+import br.com.muranodesign.model.Agrupamento;
+import br.com.muranodesign.model.Oficina;
 import br.com.muranodesign.model.Rotina;
 
 public class RotinaDAOImpl extends AbstractHibernateDAO implements RotinaDAO{
@@ -105,11 +108,55 @@ public class RotinaDAOImpl extends AbstractHibernateDAO implements RotinaDAO{
 	 * @see br.com.muranodesign.dao.RotinaDAO#listarPorAgrupamento(int)
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Rotina> listarPorAgrupamento(int idAgrupamento){
+	public List<Oficina> listarPorAgrupamento(int idAgrupamento){
 		Criteria criteria = getSession().createCriteria(Rotina.class);
 		criteria.createAlias("agrupamento", "agrupamento");
 		criteria.add(Restrictions.eq("agrupamento.Idagrupamento", idAgrupamento));
+		criteria.setProjection(Projections.distinct(Projections.property("oficina")));
+		List<Oficina> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Rotina> listarRotinaAlunoDia(int idagrupamento, int iddiaSemana) {
+		Criteria criteria = getSession().createCriteria(Rotina.class);
+		criteria.createAlias("agrupamento", "agrupamento");
+		criteria.add(Restrictions.eq("agrupamento.Idagrupamento", idagrupamento));
+		criteria.createAlias("dia", "dia");
+		criteria.add(Restrictions.eq("dia.Idsemana", iddiaSemana));
 		List<Rotina> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Rotina> listarRotinaOficinaDia(int idoficina, int idDiaSemana) {
+		Criteria criteria = getSession().createCriteria(Rotina.class);
+		criteria.createAlias("oficina", "oficina");
+		criteria.add(Restrictions.eq("oficina.Idoficina", idoficina));
+		criteria.createAlias("dia", "dia");
+		criteria.add(Restrictions.eq("dia.Idsemana", idDiaSemana));
+		List<Rotina> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Rotina> listarRotinaTutoriaDia(Integer idtutoria, int idDiaSemana) {
+		Criteria criteria = getSession().createCriteria(Rotina.class);
+		criteria.createAlias("tutoria", "tutoria");
+		criteria.add(Restrictions.eq("tutoria.idtutoria", idtutoria));
+		criteria.createAlias("dia", "dia");
+		criteria.add(Restrictions.eq("dia.Idsemana", idDiaSemana));
+		List<Rotina> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Agrupamento> listarAgrupamentoPorOficina(int idOficina) {
+		Criteria criteria = getSession().createCriteria(Rotina.class);
+		criteria.createAlias("oficina", "oficina");
+		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
+		criteria.setProjection(Projections.distinct(Projections.property("agrupamento")));
+		List<Agrupamento> result = criteria.list();
 		return result;
 	}
 

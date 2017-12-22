@@ -47,6 +47,7 @@ public class UsuarioDAOImpl extends AbstractHibernateDAO implements UsuarioDAO {
 	public List<Usuario> listAll() {
 		
 		Criteria criteria = getSession().createCriteria(Usuario.class);
+		criteria.add(Restrictions.eq("ativo", 0));
 		List<Usuario> result = criteria.list();
 		
 		
@@ -156,6 +157,15 @@ public class UsuarioDAOImpl extends AbstractHibernateDAO implements UsuarioDAO {
 		Criteria criteria = getSession().createCriteria(Usuario.class);
 		//criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("email", email));
+		List<Usuario> result = criteria.list();
+		return result;
+	}
+
+	@Override
+	public List<Usuario> listarPerfil(int idPerfil) {
+		Criteria criteria = getSession().createCriteria(Usuario.class);
+		criteria.createAlias("perfil", "perfil");
+		criteria.add(Restrictions.eq("perfil.idperfil", idPerfil));
 		List<Usuario> result = criteria.list();
 		return result;
 	}

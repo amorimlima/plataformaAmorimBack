@@ -113,9 +113,8 @@ public class ProfessorFuncionarioDAOImpl extends AbstractHibernateDAO implements
 		 ProjectionList projList = Projections.projectionList();  
 		 projList.add(Projections.property("idprofessorFuncionario"),"idprofessorFuncionario"); 
 		 projList.add(Projections.property("nome"),"nome"); 
-		 
+		 criteria.add(Restrictions.eq("ativo", "s"));
 		 criteria.setProjection(projList);
-		    
 		 criteria.setResultTransformer(Transformers.aliasToBean(ProfessorFuncionario.class));  
 		 List<ProfessorFuncionario> results = criteria.list();
 		

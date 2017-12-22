@@ -178,6 +178,7 @@ public class RoteiroDAOImpl extends AbstractHibernateDAO implements RoteiroDAO {
 		
 		criteria.createAlias("anoEstudo", "anoEstudo");
 		criteria.add(Restrictions.eq("anoEstudo.idanoEstudo", anoEstudo));
+		criteria.add(Restrictions.eqOrIsNull("ativo", 1));
 		projList.add(Projections.property("idroteiro"),"idroteiro");
 		projList.add(Projections.property("nome"),"nome");
 		criteria.setProjection(projList).setCacheable(true);

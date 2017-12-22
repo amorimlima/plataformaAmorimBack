@@ -50,6 +50,9 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		Criteria criteria = getSession().createCriteria(Mensagens.class);
 		List<Mensagens> result = criteria.list();
 		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 		
 		return result;
 	} 
@@ -63,6 +66,10 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		Criteria criteria = getSession().createCriteria(Mensagens.class);
 		criteria.setFirstResult(primeiro);
 		criteria.setMaxResults(ultimo);
+		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 		
 		List<Mensagens> result = criteria.list();
 		
@@ -119,7 +126,9 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 	public List<Mensagens> listarProprietario(Usuario proprietario) {
 		Criteria criteria = getSession().createCriteria(Mensagens.class);
 		
+		criteria.addOrder(Order.asc("lida"));
 		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 		
 		
 		criteria.add(Restrictions.eq("proprietario", proprietario));
@@ -141,12 +150,16 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		Criteria criteria = getSession().createCriteria(Mensagens.class);
 		
 
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
+		
 		if (caixa.equals("entrada")){ 
 			criteria.add(Restrictions.eq("cxEntrada", "S"));
 			
 		} else if  (caixa.equals("enviado")){
 			criteria.add(Restrictions.eq("cxEnviada", "S"));
-			
+	
 		}
 		
 		criteria.setFirstResult(primeiro);
@@ -154,8 +167,6 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		
 		criteria.add(Restrictions.eq("proprietario", proprietario));
 		
-		
-		criteria.addOrder(Order.desc("data"));
 		List<Mensagens> result = criteria.list();
 		return result;
 	}
@@ -179,7 +190,10 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		criteria.add(Restrictions.eq("proprietario", proprietario));
 		
 		
+		criteria.addOrder(Order.asc("lida"));
 		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
+		
 		List<Mensagens> result = criteria.list();
 		return result;
 	}
@@ -195,6 +209,9 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		criteria.add(Restrictions.eq("proprietario.idusuario", idProprietario));
 		criteria.add(Restrictions.eq("idmensagens", idMensagem));
 		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 		
 		List<Mensagens> result = criteria.list();
 		return result;
@@ -210,6 +227,10 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		criteria.createAlias("remetente", "remetente");
 		criteria.add(Restrictions.eq("remetente.idusuario", id));
 		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
+		
 		List<Mensagens> result = criteria.list();
 		return result;
 		
@@ -224,6 +245,10 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		Criteria criteria = getSession().createCriteria(Mensagens.class);
 		criteria.createAlias("proprietario", "proprietario");
 		criteria.add(Restrictions.eq("proprietario.idusuario", id));
+		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 		
 		List<Mensagens> result = criteria.list();
 		return result;
@@ -243,6 +268,10 @@ public class MensagensDAOImpl extends AbstractHibernateDAO implements MensagensD
 		criteria.add(Restrictions.eq("lida", "N"));
 		criteria.add(Restrictions.eq("cxEntrada", "S"));
 		criteria.add(Restrictions.eq("cxEnviada", "N"));
+		
+		criteria.addOrder(Order.asc("lida"));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idmensagens"));
 
 		List<Mensagens> result = criteria.list();
 		return result;

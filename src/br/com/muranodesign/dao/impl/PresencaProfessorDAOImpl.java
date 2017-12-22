@@ -9,6 +9,7 @@
  */
 
 package br.com.muranodesign.dao.impl;
+import java.util.Calendar;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -100,6 +101,9 @@ public class PresencaProfessorDAOImpl extends AbstractHibernateDAO implements Pr
 	@SuppressWarnings("unchecked")
 	public List<PresencaProfessor> listarFaltas(int id){
 		Criteria criteria = getSession().createCriteria(PresencaProfessor.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("data", cal.getTime()));
 		criteria.createAlias("professor", "professor");
 		criteria.add(Restrictions.eq("professor.idprofessorFuncionarioVariavel", id));
 		criteria.add(Restrictions.eq("presenca", 0));
@@ -108,8 +112,18 @@ public class PresencaProfessorDAOImpl extends AbstractHibernateDAO implements Pr
 		
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<PresencaProfessor> listarPresencas(Integer id){
+			Criteria criteria = getSession().createCriteria(PresencaProfessor.class);
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.DAY_OF_YEAR, 1);
+			criteria.add(Restrictions.ge("data", cal.getTime()));
+			criteria.createAlias("professor", "professor");
+			criteria.add(Restrictions.eq("professor.idprofessorFuncionarioVariavel", id));
+			criteria.add(Restrictions.eq("presenca", 1));
+			List<PresencaProfessor> result = criteria.list();
+			return result;
+	}
 
-
-	
 
 }

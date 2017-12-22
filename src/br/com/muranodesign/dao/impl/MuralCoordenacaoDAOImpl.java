@@ -3,6 +3,7 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.MuralCoordenacaoDAO;
@@ -25,6 +26,8 @@ public class MuralCoordenacaoDAOImpl extends AbstractHibernateDAO implements Mur
 	public List<MuralCoordenacao> listAll() {
 		Criteria criteria = getSession().createCriteria(MuralCoordenacao.class);
 		List<MuralCoordenacao> result = criteria.list();
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("hora"));
 		return result;
 	}
 
@@ -68,6 +71,28 @@ public class MuralCoordenacaoDAOImpl extends AbstractHibernateDAO implements Mur
 	public void deletar(MuralCoordenacao p) {
 		getSession().delete(p);
 		getSession().flush();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<MuralCoordenacao> listarProfessor(int idProfessor) {
+		Criteria criteria = getSession().createCriteria(MuralCoordenacao.class);
+		criteria.createAlias("professor", "professor");
+		criteria.add(Restrictions.eq("professor.idprofessorFuncionario", idProfessor));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("hora"));
+		List<MuralCoordenacao> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<MuralCoordenacao> listarPerfil(int perfil) {
+		Criteria criteria = getSession().createCriteria(MuralCoordenacao.class);
+		criteria.createAlias("perfil", "perfil");
+		criteria.add(Restrictions.eq("perfil.idperfil", perfil));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("hora"));
+		List<MuralCoordenacao> result = criteria.list();
+		return result;
 	}
 
 }

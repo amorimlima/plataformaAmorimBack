@@ -9,6 +9,8 @@
  */
 
 package br.com.muranodesign.dao.impl;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -104,6 +106,38 @@ public class RelatorioTutoriaDAOImpl extends AbstractHibernateDAO implements Rel
 		criteria.add(Restrictions.eq("aluno.idAluno", aluno));
 		criteria.createAlias("tutoria", "tutoria");
 		criteria.add(Restrictions.eq("tutoria.idtutoria", tutoria));
+		List<RelatorioTutoria> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<RelatorioTutoria> listarTutoriaAlunoAno(int tutoria, int aluno,
+			int ano) {
+		Criteria criteria = getSession().createCriteria(RelatorioTutoria.class);
+		Calendar calInicio = Calendar.getInstance();
+		calInicio.set(Calendar.YEAR, ano);
+		calInicio.set(Calendar.DAY_OF_YEAR, 1);
+		Calendar calFim = Calendar.getInstance();
+		calFim.set(Calendar.YEAR, ano);
+		calFim.set(Calendar.DAY_OF_YEAR, calFim.getActualMaximum(Calendar.DAY_OF_YEAR));
+		criteria.add(Restrictions.ge("data",  calInicio.getTime()));
+		criteria.add(Restrictions.le("data", calFim.getTime()));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", aluno));
+		criteria.createAlias("tutoria", "tutoria");
+		criteria.add(Restrictions.eq("tutoria.idtutoria", tutoria));
+		List<RelatorioTutoria> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RelatorioTutoria> getRelatorioData(Date inicio, Date fim,
+			int idAluno) {
+		Criteria criteria = getSession().createCriteria(RelatorioTutoria.class);
+		criteria.add(Restrictions.between("data", inicio, fim));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
 		List<RelatorioTutoria> result = criteria.list();
 		return result;
 	}

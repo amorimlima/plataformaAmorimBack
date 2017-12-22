@@ -63,6 +63,9 @@ public class AlunoDAOImpl extends AbstractHibernateDAO implements AlunoDAO {
 	@SuppressWarnings("unchecked")
 	public List<Aluno> listIntervalo(int primeiro, int ultimo){
 		Criteria criteria = getSession().createCriteria(Aluno.class);
+		
+		criteria.add(Restrictions.eq("ativo", "s"));
+		
 		criteria.setFirstResult(primeiro);
 		criteria.setMaxResults(ultimo);
 		
@@ -78,7 +81,8 @@ public class AlunoDAOImpl extends AbstractHibernateDAO implements AlunoDAO {
 	@SuppressWarnings("unchecked")
 	public List<Aluno> listAllLike(String letra){
 		Criteria criteria = getSession().createCriteria(Aluno.class);
-		criteria.add(Restrictions.like("nome", letra, MatchMode.START));
+		criteria.add(Restrictions.eq("ativo", "s"));
+		criteria.add(Restrictions.like("nome", letra, MatchMode.ANYWHERE));
 		List<Aluno> result = criteria.list();
 		return result;
 	}

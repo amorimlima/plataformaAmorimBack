@@ -3,6 +3,7 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.MuralDAO;
@@ -88,6 +89,7 @@ public class MuralDAOImpl extends AbstractHibernateDAO implements MuralDAO{
 		
 		criteria.add(Restrictions.ge("data", stringUtil.converteStringData(data2)));
 		criteria.add(Restrictions.lt("data", stringUtil.converteStringData(data)));
+		criteria.addOrder(Order.desc("data"));
 		List<Mural> result = criteria.list();
 		
 		
