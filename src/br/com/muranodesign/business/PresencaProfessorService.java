@@ -109,5 +109,13 @@ public class PresencaProfessorService {
 		return p;
 	}
 
+	public List<PresencaProfessor> listarPresencas(Integer idprofessorFuncionario) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PresencaProfessorDAO dao = DAOFactory.getPresencaProfessorDAO(pc);
+		List<PresencaProfessor> result = dao.listarPresencas(idprofessorFuncionario);
+		pc.commitAndClose();
+		return result;
+	}
+
 	
 }
