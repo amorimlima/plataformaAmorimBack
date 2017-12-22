@@ -9,20 +9,18 @@
  */
 package br.com.muranodesign.resources;
 
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
@@ -34,11 +32,6 @@ import br.com.muranodesign.model.ForumQuestao;
 import br.com.muranodesign.model.ForumResposta;
 import br.com.muranodesign.model.Roteiro;
 import br.com.muranodesign.model.Usuario;
-import br.com.muranodesign.util.StringUtil;
-import br.com.muranodesign.util.Upload;
-
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 
 /**
@@ -317,42 +310,20 @@ public class ForumQuestaoResource {
 	 * @param action
 	 * @param strid
 	 * @param questao
-	 * @param uploadedInputStream
-	 * @param fileDetail
 	 * @param usuario
 	 * @param roteiro
 	 * @return  id
 	 */
 	@POST
-	//@Path("upload")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String eventoAction(
-
-			@FormDataParam("action") String action,
-			@FormDataParam("id") String strid,
-
-			@FormDataParam("questao") String questao,
-			@FormDataParam("anexo") InputStream uploadedInputStream,
-			@FormDataParam("anexo") FormDataContentDisposition fileDetail,
-			@FormDataParam("usuario") String usuario,
-			@FormDataParam("roteiro") String roteiro
+			@FormParam("action") String action,
+			@FormParam("id") String strid,
+			@FormParam("questao") String questao,
+			@FormParam("usuario") String usuario,
+			@FormParam("roteiro") String roteiro
 
 			) {
-			
-				StringUtil stringUtil = new StringUtil();
-				String arquivo = stringUtil.geraNomeAleatorio(fileDetail.getFileName(),50);
-				String uploadedFileLocation = "/home/tomcat/webapps/files/" + arquivo;
 				
-				
-				
-				 
-				Upload upload = new Upload (); 
-				// save it
-				upload.writeToFile(uploadedInputStream, uploadedFileLocation);
-				
-				
-		 
-				String anexo = "http://177.55.99.90/files/"+ arquivo;
  
 		
 		ForumQuestao objForumQuestao = new ForumQuestao();
@@ -379,7 +350,6 @@ public class ForumQuestaoResource {
 			objForumQuestao.setData(new Date());
 			objForumQuestao.setUsuario(objUsuario);
 			objForumQuestao.setRoteiro(objRoteiro);
-			objForumQuestao.setAnexo(anexo);
 		
 
 			resultado = new ForumQuestaoService().criarForumQuestao(objForumQuestao);

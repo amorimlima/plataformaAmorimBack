@@ -319,6 +319,7 @@ public class RecursoAprendizagemResource {
 	 * @return obj RecursoAprendizagem
 	 */
 	@Path("update/curtir/{id}/{curtir}")
+	@POST
 	public RecursoAprendizagem eventoAction3(
 
 			@PathParam("id") String strId,

@@ -11,6 +11,8 @@ package br.com.muranodesign.resources;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -25,10 +27,15 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 
 import br.com.muranodesign.business.GrupoService;
+import br.com.muranodesign.business.ObjetivoService;
+import br.com.muranodesign.business.PlanejamentoRoteiroService;
+import br.com.muranodesign.business.PresencaProfessorService;
 import br.com.muranodesign.business.ProfessorFuncionarioService;
+import br.com.muranodesign.business.ProfessorFuncionarioVariavelService;
 import br.com.muranodesign.business.TutoriaService;
 import br.com.muranodesign.model.Grupo;
 import br.com.muranodesign.model.ProfessorFuncionario;
+import br.com.muranodesign.model.ProfessorFuncionarioVariavel;
 import br.com.muranodesign.model.Tutoria;
 import br.com.muranodesign.util.StringUtil;
 import br.com.muranodesign.util.Upload;
@@ -129,6 +136,89 @@ public class ProfessorFuncionarioResource {
 		
 	}
 	
+	@Path("Teste/{idTutoria}")
+	@GET
+	@Produces("application/json")
+	public float teste(@PathParam("idTutoria") int idTutoria){
+		return new ObjetivoService().countObjetivosAtribuicaoTutoria(idTutoria);
+	}
+	
+	@Path("DadosTutoriaProfessores/")
+	@GET
+	@Produces("application/json")
+	public List<Object> tutoriaDados()
+	{
+		List<Object> resultado = new ArrayList<Object>();
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+
+		List<Tutoria> tutorias = new TutoriaService().listarAno(ano);
+//		List<Tutoria> tutorias = new ArrayList<Tutoria>();
+//		
+//		tutorias.add(new TutoriaService().listarkey(104).get(0));
+		
+		for (Tutoria tutoria : tutorias) {
+			Hashtable<String, Object> professorDados = new Hashtable<String, Object>();
+			ProfessorFuncionarioVariavel professorVariavel = new ProfessorFuncionarioVariavelService().listarProfessor(tutoria.getTutor().getIdprofessorFuncionario()).get(0);
+			professorDados.put("faltas", new PresencaProfessorService().listarFaltas(professorVariavel.getIdprofessorFuncionarioVariavel()).size());
+			professorDados.put("presencas", new PresencaProfessorService().listarPresencas(professorVariavel.getIdprofessorFuncionarioVariavel()).size());
+			professorDados.put("nome", tutoria.getTutor().getNome());
+			professorDados.put("idProfessor", tutoria.getTutor().getIdprofessorFuncionario());
+			if (tutoria.getTutor().getFotoProfessorFuncionario() != null)
+				professorDados.put("foto", tutoria.getTutor().getFotoProfessorFuncionario());
+			else
+				professorDados.put("foto", "null");
+			float objetivosTotais = 0;
+			float objetivosCompletos = 0;
+			float objetivosCorrigidos = 0;
+			List<Grupo> grupos = new GrupoService().listarTutor(tutoria.getIdtutoria());
+			objetivosTotais += new ObjetivoService().countObjetivosAnoProfessor(tutoria.getIdtutoria());
+			objetivosTotais += new ObjetivoService().countObjetivosAtribuicaoTutoria(tutoria.getIdtutoria());
+			objetivosCompletos += new PlanejamentoRoteiroService().countCompletosTutoria(tutoria.getIdtutoria());
+			objetivosCorrigidos += new PlanejamentoRoteiroService().countCorrigidosTutoria(tutoria.getIdtutoria());
+			/*for (Grupo grupo : grupos) {
+				List<AlunoVariavel> alunosGrupo = new AlunoVariavelService().listaGrupo(grupo.getIdgrupo());
+				for (AlunoVariavel alunoVariavel : alunosGrupo) {
+					List<Roteiro> roteirosAno = new RoteiroService().listarAno(alunoVariavel.getAnoEstudo().getIdanoEstudo());
+					for (Roteiro roteiro : roteirosAno) {
+						objetivosTotais += new ObjetivoService().listarRoteiroTotal(roteiro.getIdroteiro());
+					}
+					List<AtribuicaoRoteiroExtra> roteirosExtra = new AtribuicaoRoteiroExtraService().listarAluno(new AlunoService().listarkey(alunoVariavel.getAluno().getIdAluno()).get(0), new AnoLetivoService().listarkey(alunoVariavel.getAnoLetivo().getIdanoLetivo()).get(0));
+					for (AtribuicaoRoteiroExtra atribuicaoRoteiroExtra : roteirosExtra) {
+						objetivosTotais += new ObjetivoService().listarRoteiroTotal(atribuicaoRoteiroExtra.getRoteiro().getIdroteiro());
+					
+					List<PlanejamentoRoteiro> planejamentosCompletos = new PlanejamentoRoteiroService().listarAlunoCompletosLista(alunoVariavel.getAluno().getIdAluno());
+					List<PlanejamentoRoteiro> planejamentosCorrigidos = new PlanejamentoRoteiroService().listarAlunoCorrigidosLista(alunoVariavel.getAluno().getIdAluno());
+					
+					objetivosCompletos += planejamentosCompletos.size();
+					objetivosCorrigidos += planejamentosCorrigidos.size();	}					
+				}
+				if (alunosGrupo.size() == 0)
+					new GrupoService().deletarGrupo(grupo);
+			}*/
+			if (objetivosTotais == 0)
+				grupos.clear();
+			Hashtable<String, Float> objetivos = new Hashtable<String, Float>();
+			if (objetivosTotais > 0)
+			{
+				objetivos.put("completos", (objetivosCompletos + objetivosCorrigidos) / objetivosTotais);
+				objetivos.put("corrigidos", objetivosCorrigidos / objetivosTotais);
+			}
+			else
+			{
+				objetivos.put("completos", 0.0f);
+				objetivos.put("corrigidos", 0.0f);
+			}
+			
+			professorDados.put("objetivos", objetivos);
+			if (!grupos.isEmpty())
+			{
+				resultado.add(professorDados);
+			}
+		}
+		return resultado;
+	}
+	
 	
 	@Path("ProfessorNomeId/")
 	@GET
@@ -225,8 +315,13 @@ public class ProfessorFuncionarioResource {
 
 			@FormParam("dataEntradaEscola") String dataEntradaEscola,
 			/*@FormParam("perfil") int perfil,*/
-			@FormParam("observacao") String observacao
+			@FormParam("observacao") String observacao,
 			
+			@FormParam("email1") String email1,
+			@FormParam("email2") String email2,
+			@FormParam("telefoneResidencial") String telefoneResidencial,
+			@FormParam("telefoneCelular") String telefoneCelular,
+			@FormParam("jeiff") String jeiff
 			
 
 
@@ -285,6 +380,21 @@ public class ProfessorFuncionarioResource {
 			if (!observacao.isEmpty()) {
 				objProfessorFuncionario.setObservacao(observacao);
 			}
+			if(!email1.isEmpty()){
+				objProfessorFuncionario.setEmail1(email1);
+			}
+			if(!email2.isEmpty()){
+				objProfessorFuncionario.setEmail2(email2);
+			}
+			if(!telefoneCelular.isEmpty()){
+				objProfessorFuncionario.setTelefoneCelular(telefoneCelular);
+			}
+			if(!telefoneResidencial.isEmpty()){
+				objProfessorFuncionario.setTelefoneResidencial(telefoneResidencial);
+			}
+			if(!jeiff.isEmpty()){
+				objProfessorFuncionario.setJeiff(jeiff);
+			}
 
 			
 			resultado = new ProfessorFuncionarioService().criarProfessorFuncionario(objProfessorFuncionario);
@@ -342,6 +452,21 @@ public class ProfessorFuncionarioResource {
 			if (!observacao.isEmpty()) {
 				objProfessorFuncionario.setObservacao(observacao);
 			}
+			if(!email1.isEmpty()){
+				objProfessorFuncionario.setEmail1(email1);
+			}
+			if(!email2.isEmpty()){
+				objProfessorFuncionario.setEmail2(email2);
+			}
+			if(!telefoneCelular.isEmpty()){
+				objProfessorFuncionario.setTelefoneCelular(telefoneCelular);
+			}
+			if(!telefoneResidencial.isEmpty()){
+				objProfessorFuncionario.setTelefoneResidencial(telefoneResidencial);
+			}
+			if(!jeiff.isEmpty()){
+				objProfessorFuncionario.setJeiff(jeiff);
+			}
 			
 			resultado = new ProfessorFuncionarioService().atualizarProfessorFuncionario(objProfessorFuncionario);
 
@@ -383,11 +508,16 @@ public class ProfessorFuncionarioResource {
 		String uploadedFileLocation = "/home/tomcat/webapps/files/" + imagem;
 		String anexo = "http://177.55.99.90/files/" + imagem;
 
+//		String uploadedFileLocation = "C:/Users/murano/Desktop/Teste/" + imagem;
+//		String anexo = "C:/Users/murano/Desktop/Teste/" + imagem;
+		
 		Upload upload = new Upload();
 		upload.writeToFile(uploadedInputStream, uploadedFileLocation);
 
 		logger.info("anexo" + anexo);
 
+		if (objProfessorFuncionario.getFotoProfessorFuncionario() != null)
+			upload.deleteFile(objProfessorFuncionario.getFotoProfessorFuncionario());
 		objProfessorFuncionario.setFotoProfessorFuncionario(anexo);
 
 		resultado = new ProfessorFuncionarioService().atualizarProfessorFuncionario(objProfessorFuncionario);

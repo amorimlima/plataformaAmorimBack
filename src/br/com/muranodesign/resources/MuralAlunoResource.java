@@ -16,7 +16,11 @@ import br.com.muranodesign.business.MuralAlunoService;
 import br.com.muranodesign.business.MuralService;
 import br.com.muranodesign.model.MuralAluno;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("MuralAluno")
 public class MuralAlunoResource {
 	private Logger logger = Logger.getLogger(MuralAlunoResource.class.getName());

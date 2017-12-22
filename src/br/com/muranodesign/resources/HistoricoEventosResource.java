@@ -22,7 +22,11 @@ import br.com.muranodesign.model.CalendarioEventos;
 import br.com.muranodesign.model.Imagens;
 import br.com.muranodesign.model.historicoEventos;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("HistoricoEventos")
 public class HistoricoEventosResource {
 	

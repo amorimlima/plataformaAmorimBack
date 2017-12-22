@@ -11,6 +11,7 @@ package br.com.muranodesign.resources;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -194,14 +195,11 @@ public class AlunoResource {
 		logger.debug("Listar Alunos ...");
 		List<Aluno> alunos;
 		
-		@SuppressWarnings("unused")
-		List<AlunoVariavel> variavel;
 		alunos = new AlunoService().listAllLike(letra);
 		int qtd = alunos.size();
 		String html = "";
 		
 		for(int i = 0; i < qtd; i++){
-			 variavel = new AlunoVariavelService().listaAluno(alunos.get(i).getIdAluno());
 			
 			
 			html +=  "<tr id="+"aluno"+" onClick="+"editarAluno"+"("+alunos.get(i).getIdAluno()+")"+">"+
@@ -262,7 +260,8 @@ public class AlunoResource {
 	public String getHtmlAlunoAnoPeriodo(@PathParam("ano") int ano,@PathParam("periodo") int periodo){
 		logger.debug("Listar Alunos ...");
 		List<AlunoVariavel> variaveis;
-		variaveis  = new AlunoVariavelService().listaAnoEstudoPeriodo(new AnoEstudoService().listarkey(ano).get(0), new PeriodoService().listarkey(periodo).get(0));
+		int anoLetivo = Calendar.getInstance().get(Calendar.YEAR);
+		variaveis  = new AlunoVariavelService().listaAnoEstudoPeriodo(new AnoEstudoService().listarkey(ano).get(0), new PeriodoService().listarkey(periodo).get(0), anoLetivo);
 		int qtd = variaveis.size();
 		String html = "";
 		
@@ -328,6 +327,8 @@ public class AlunoResource {
 
 		logger.info("anexo" + anexo);
 
+		if (objAluno.getFotoAluno() != null)
+			upload.deleteFile(objAluno.getFotoAluno());
 		objAluno.setFotoAluno(anexo);
 		Aluno resultado = new AlunoService().atualizarAluno(objAluno);
 
@@ -538,6 +539,7 @@ public class AlunoResource {
 			@FormParam("ufMae") String ufMae,
 			@FormParam("ufPai") String ufPai,
 			@FormParam("ufResponsavel") String ufResponsavel,
+			@FormParam("fotoAluno") String fotoAluno,
 			@FormParam("sexo") String sexo,
 			@FormParam("ativo") String ativo,
 			@FormParam("numeroEol") String numeroEol,
@@ -723,6 +725,9 @@ public class AlunoResource {
 			}
 			if (!ufResponsavel.isEmpty()) {
 				objAluno.setUfResponsavel(ufResponsavel);
+			}
+			if (!fotoAluno.isEmpty()){
+				objAluno.setFotoAluno(fotoAluno);
 			}
 			if (!sexo.isEmpty()) {
 				objAluno.setSexo(sexo);
@@ -926,16 +931,16 @@ public class AlunoResource {
 			if (!necessidadeEspecial.isEmpty()) {
 				objAluno.setNecessidadeEspecial(necessidadeEspecial);
 			}
-			if (!uf.isEmpty()) {
+			if (!uf.isEmpty() && !(uf.equals("null"))) {
 				objAluno.setUf(uf);
 			}
-			if (!ufMae.isEmpty()) {
+			if (!ufMae.isEmpty() && !(ufMae.equals("null"))) {
 				objAluno.setUfMae(ufMae);
 			}
-			if (!ufPai.isEmpty()) {
+			if (!ufPai.isEmpty() && !(ufPai.equals("null"))) {
 				objAluno.setUfPai(ufPai);
 			}
-			if (!ufResponsavel.isEmpty()) {
+			if (!ufResponsavel.isEmpty() && !(ufResponsavel.equals("null"))) {
 				objAluno.setUfResponsavel(ufResponsavel);
 			}
 			

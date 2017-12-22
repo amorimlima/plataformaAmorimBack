@@ -17,7 +17,11 @@ import br.com.muranodesign.business.SOService;
 import br.com.muranodesign.model.Historico_conexao;
 import br.com.muranodesign.model.SO;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Metricas")
 public class MetricasResource {
 

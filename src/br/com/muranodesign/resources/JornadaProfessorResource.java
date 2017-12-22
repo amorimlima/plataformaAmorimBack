@@ -22,6 +22,11 @@ import br.com.muranodesign.model.OficinaProfessor;
 
 
 //Alteração que pode mudar
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("JornadaProfessor")
 public class JornadaProfessorResource {
 

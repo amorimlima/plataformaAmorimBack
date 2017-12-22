@@ -16,6 +16,11 @@ import br.com.muranodesign.business.FichaInscricaoService;
 import br.com.muranodesign.business.RoteiroService;
 import br.com.muranodesign.model.FichaInscricao;
 
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("FichaFinalizacao")
 public class FichaInscricaoResource {
 	

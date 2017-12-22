@@ -9,19 +9,17 @@
  */
 package br.com.muranodesign.resources;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
@@ -31,11 +29,6 @@ import br.com.muranodesign.business.UsuarioService;
 import br.com.muranodesign.model.ForumQuestao;
 import br.com.muranodesign.model.ForumResposta;
 import br.com.muranodesign.model.Usuario;
-import br.com.muranodesign.util.StringUtil;
-import br.com.muranodesign.util.Upload;
-
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 
 /**
@@ -192,35 +185,16 @@ public class ForumRespostaResource {
 	 */
 	@POST
 	//@Path("upload")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String eventoAction(
 
-			@FormDataParam("action") String action,
-			@FormDataParam("id") String strid,
+			@FormParam("action") String action,
+			@FormParam("id") String strid,
 
-			@FormDataParam("resposta") String resposta,
-			@FormDataParam("anexo") InputStream uploadedInputStream,
-			@FormDataParam("anexo") FormDataContentDisposition fileDetail,
-			@FormDataParam("usuario") String usuario,
-			@FormDataParam("forumQuestao") String forumQuestao
+			@FormParam("resposta") String resposta,
+			@FormParam("usuario") String usuario,
+			@FormParam("forumQuestao") String forumQuestao
 
-			) {
-		
-		
-		//TODO: Criar uma configiracao para o caminho
-		StringUtil stringUtil = new StringUtil();
-		String arquivo = stringUtil.geraNomeAleatorio(fileDetail.getFileName(),50);
-		String uploadedFileLocation = "/home/tomcat/webapps/files/" + arquivo;
-		
-		 
-		Upload upload = new Upload (); 
-		// save it
-		upload.writeToFile(uploadedInputStream, uploadedFileLocation);
-		
-		
-		String anexo = "http://177.55.99.90/files/"+ arquivo;
-
-		
+			) {		
 		ForumResposta objForumResposta = new ForumResposta();
 		logger.info("eventoAction ...");
 		ForumResposta  resultado;
@@ -245,7 +219,6 @@ public class ForumRespostaResource {
 			objForumResposta.setData(new Date());
 			objForumResposta.setUsuario(objUsuario);
 			objForumResposta.setForumQuestao(objForumQuestao);
-			objForumResposta.setAnexo(anexo);
 			objForumResposta.setVisto(0);
 		
 
@@ -262,7 +235,6 @@ public class ForumRespostaResource {
 			objForumResposta.setData(new Date());
 			objForumResposta.setUsuario(objUsuario);
 			objForumResposta.setForumQuestao(objForumQuestao);
-			objForumResposta.setAnexo(anexo);
 			objForumResposta.setVisto(0);
 
 			resultado = new ForumRespostaService().atualizarForumResposta(objForumResposta);

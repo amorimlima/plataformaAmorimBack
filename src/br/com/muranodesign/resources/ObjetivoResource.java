@@ -1,5 +1,4 @@
 /**
- *   Este codigo é software livre você e pode resdistribuir e/ou modificar ele seguindo os termos da
  *   Creative Commons Attribution 4.0 International Pare visualizar uma copia desta 
  *   licensa em ingles visite http://creativecommons.org/licenses/by/4.0/.
  *   
@@ -12,7 +11,6 @@ package br.com.muranodesign.resources;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -94,16 +92,17 @@ public class ObjetivoResource {
 	 * @return
 	 */
 	@Path("InativarObjetivo/{id}")
-	@DELETE
+	@GET
 	@Produces("text/plain")
 	public String deletarObjetivo(@PathParam("id") int id){
 		
 		List<Atividade> atividades = new AtividadeService().listarObjetivo(id);
-		Objetivo  objetivo = new Objetivo();
+		List<PlanejamentoRoteiro> planejamentos = new PlanejamentoRoteiroService().listarObjetivoTotal(id);
+		Objetivo  objetivo = new ObjetivoService().listarkey(id).get(0);
 		
 		String retorno = "";
 		
-		if(!atividades.isEmpty()){
+		if(!atividades.isEmpty() || !planejamentos.isEmpty()){
 			objetivo.setAtivo(0);
 			new ObjetivoService().atualizarObjetivo(objetivo);
 			
@@ -363,7 +362,7 @@ public class ObjetivoResource {
 	 * @return the string
 	 */
 	@Path("{id}")
-	@DELETE
+	@GET
 	@Produces("text/plain")
 	public String removeObjetivo(@PathParam("id") int id) {
 
@@ -464,7 +463,8 @@ public class ObjetivoResource {
 			@FormParam("nome") String nome,
 			@FormParam("descricao") String descricao,
 			@FormParam("roteiro") String roteiro,
-			@FormParam("ativo") String ativo
+			@FormParam("ativo") String ativo,
+			@FormParam("numero") int numero
 
 	) {
 		Objetivo objObjetivo = new Objetivo();
@@ -480,6 +480,7 @@ public class ObjetivoResource {
 			objObjetivo.setNome(nome);
 			objObjetivo.setDescricao(descricao);
 			objObjetivo.setRoteiro(objRoteiro);
+			objObjetivo.setNumero(numero);
 			objObjetivo.setAtivo(Integer.parseInt(ativo));
 
 			resultado = new ObjetivoService().criarObjetivo(objObjetivo);

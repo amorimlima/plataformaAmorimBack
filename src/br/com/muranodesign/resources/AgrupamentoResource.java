@@ -15,11 +15,17 @@ import org.apache.log4j.Logger;
 import br.com.muranodesign.business.AgrupamentoService;
 import br.com.muranodesign.business.AnoLetivoService;
 import br.com.muranodesign.business.CiclosService;
+import br.com.muranodesign.business.OficinaProfessorService;
 import br.com.muranodesign.business.RotinaService;
 import br.com.muranodesign.model.Agrupamento;
+import br.com.muranodesign.model.OficinaProfessor;
 import br.com.muranodesign.model.Rotina;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Agrupamento")
 public class AgrupamentoResource {
 	
@@ -146,4 +152,25 @@ public class AgrupamentoResource {
 		logger.debug("QTD Agrupamento : " +  resultado.size());
 		return resultado;
 	}
+	
+	@Path("ListarPorOficineiro/{idOficineiro}")
+	@GET
+	@Produces("application/json")
+	public List<Agrupamento> getByOficineiro(@PathParam("idOficineiro") int idOficineiro)
+	{
+		logger.debug("Listar Agrupamento by Oficineiro...");
+		List<Agrupamento> resultado = new ArrayList<Agrupamento>();
+		List<Rotina> rotinas;
+		List<OficinaProfessor> oficinas = new OficinaProfessorService().listarProfessor(idOficineiro);
+		for (OficinaProfessor oficinaProfessor : oficinas) {
+			rotinas = new RotinaService().listarPorOficina(oficinaProfessor.getOficina().getIdoficina());
+			for (Rotina rotina : rotinas) {
+				resultado.add(rotina.getAgrupamento());
+			}
+		}
+		logger.debug("QTD Agrupamento : " +  resultado.size());
+		return resultado;
+	}
+	
+	
 }

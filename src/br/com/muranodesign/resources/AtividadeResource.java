@@ -11,7 +11,6 @@ package br.com.muranodesign.resources;
 
 import java.util.List;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -187,7 +186,7 @@ public class AtividadeResource {
 	 * @return Atividade
 	 */
 	@Path("{id}")
-	@DELETE
+	@GET
 	@Produces("text/plain")
 	public String removeAtividade(@PathParam("id") int id) {
 		logger.debug("remover Atividade " + id );
