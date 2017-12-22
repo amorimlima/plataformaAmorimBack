@@ -9,6 +9,7 @@
  */
 package br.com.muranodesign.resources;
 
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
@@ -18,12 +19,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
@@ -40,6 +43,11 @@ import br.com.muranodesign.model.Perfil;
 import br.com.muranodesign.model.ProfessorFuncionario;
 import br.com.muranodesign.model.Usuario;
 import br.com.muranodesign.util.CommonsMail;
+import br.com.muranodesign.util.StringUtil;
+import br.com.muranodesign.util.Upload;
+
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 
 
 /**
@@ -206,6 +214,13 @@ public class UsuarioResource {
 		Usuario evento = resultado.get(0);
 
 		return evento;
+	}
+	
+	@Path("ListarPerfil/{idPerfil}")
+	@GET
+	@Produces("application/json")
+	public List<Usuario> getPerfil(@PathParam("idPerfil") int idPerfil){
+		return new UsuarioService().listarPerfil(idPerfil);
 	}
 	
 	/**
@@ -436,6 +451,51 @@ public class UsuarioResource {
 				
 		
 				return Integer.toString(resultado.getIdusuario());
+	}
+	
+	@Path("AlterarFoto/{idUsuario}")
+	@POST
+	@Produces("text/plain")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public String updateFoto(
+			@PathParam ("idUsuario") int idUsuario, 
+			@FormDataParam("foto") InputStream uploadedInputStream,
+			@FormDataParam("foto") FormDataContentDisposition fileDetail){
+		
+		Usuario usuario = new UsuarioService().listarkey(idUsuario).get(0);
+		
+		StringUtil stringUtil = new StringUtil();
+		String arquivo = stringUtil.geraNomeAleatorio(fileDetail.getFileName(),
+				50);
+		String uploadedFileLocation = "/home/tomcat/webapps/files/" + arquivo;
+		
+		Upload upload = new Upload();
+		// save it
+		upload.writeToFile(uploadedInputStream, uploadedFileLocation);
+		
+		if (usuario.getAluno() != null)
+		{
+			if (usuario.getAluno().getFotoAluno() != null)
+				upload.deleteFile(usuario.getAluno().getFotoAluno());
+			usuario.getAluno().setFotoAluno(uploadedFileLocation);
+			new AlunoService().atualizarAluno(usuario.getAluno());
+		}
+		else
+		{
+			if (usuario.getProfessor().getFotoProfessorFuncionario() != null)
+				upload.deleteFile(usuario.getProfessor().getFotoProfessorFuncionario());
+			usuario.getProfessor().setFotoProfessorFuncionario(uploadedFileLocation);
+			new ProfessorFuncionarioService().atualizarProfessorFuncionario(usuario.getProfessor());
+		}
+		
+		return "ok";
+	}
+	
+	@Path("ListarUsuarioNome/{login}")
+	@GET
+	@Produces("application/json")
+	public List<Usuario> listarNome(@PathParam("login") String login){
+		return new UsuarioService().listarLogin(login);
 	}
 
 }

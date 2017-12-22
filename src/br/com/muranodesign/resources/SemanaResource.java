@@ -13,6 +13,11 @@ import org.apache.log4j.Logger;
 import br.com.muranodesign.business.SemanaService;
 import br.com.muranodesign.model.Semana;
 
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Semana")
 public class SemanaResource {
 	

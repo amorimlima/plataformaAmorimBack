@@ -14,7 +14,11 @@ import org.apache.log4j.Logger;
 import br.com.muranodesign.business.TemplateService;
 import br.com.muranodesign.model.Template;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Template")
 public class TemplateResource {
 	
