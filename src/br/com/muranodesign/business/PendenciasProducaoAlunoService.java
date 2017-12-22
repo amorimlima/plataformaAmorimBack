@@ -57,11 +57,27 @@ public class PendenciasProducaoAlunoService {
 		pc.commitAndClose();
 		return result;
 	}
+	
+	public List<PendenciasProducaoAluno> listarAlunoRoteiroAno(int idaluno, int idroteiro, String ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PendenciasProducaoAlunoDAO dao = DAOFactory.getPendenciasProducaoAlunoDAO(pc);
+		List<PendenciasProducaoAluno> result = dao.listarAlunoRoteiroAno(idaluno, idroteiro, ano);
+		pc.commitAndClose();
+		return result;
+	}
 
 	public List<PendenciasProducaoAluno> listarall() {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		PendenciasProducaoAlunoDAO dao = DAOFactory.getPendenciasProducaoAlunoDAO(pc);
 		List<PendenciasProducaoAluno> result = dao.listAll();
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<PendenciasProducaoAluno> listarAlunoAnoAnterior(int id) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PendenciasProducaoAlunoDAO dao = DAOFactory.getPendenciasProducaoAlunoDAO(pc);
+		List<PendenciasProducaoAluno> result = dao.listarAlunoAnoAnterior(id);
 		pc.commitAndClose();
 		return result;
 	}
