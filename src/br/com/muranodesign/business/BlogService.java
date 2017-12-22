@@ -85,4 +85,36 @@ public class BlogService {
 		pc.commitAndClose();
 		return result;
 	}
+
+	public List<Blog> listarAgrupamento(int idAgrupamento) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		BlogDAO dao = DAOFactory.getBlogDAO(pc);
+		List<Blog> result = dao.listarAgrupamento(idAgrupamento);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Blog> listarTutoria(int idProfessor) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		BlogDAO dao = DAOFactory.getBlogDAO(pc);
+		List<Blog> result = dao.listarTutoria(idProfessor);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Blog> listarOficinaProfessor(int idOficina, int idProfessor) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		BlogDAO dao = DAOFactory.getBlogDAO(pc);
+		List<Blog> result = dao.listarOficinaProfessor(idOficina, idProfessor);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Blog> listarAutor(int id) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		BlogDAO dao = DAOFactory.getBlogDAO(pc);
+		List<Blog> result = dao.listarAutor(id);
+		pc.commitAndClose();
+		return result;
+	}
 }
