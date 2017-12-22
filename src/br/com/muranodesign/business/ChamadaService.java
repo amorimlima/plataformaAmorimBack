@@ -9,6 +9,7 @@
  */
 package br.com.muranodesign.business;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import br.com.muranodesign.dao.DAOFactory;
 import br.com.muranodesign.hibernate.impl.PersistenceContext;
 import br.com.muranodesign.model.Aluno;
 import br.com.muranodesign.model.Chamada;
+import br.com.muranodesign.model.Compensacao;
 
 
 
@@ -56,7 +58,14 @@ public class ChamadaService {
 		pc.commitAndClose();
 		return result;
 	}
-	
+
+	public List<Chamada> listarEntre(int id, Date startDate, Date endDate) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		List<Chamada> result = dao.listBetween(id,startDate,endDate);
+		pc.commitAndClose();
+		return result;
+	}
 	
 	/**
 	 * Criar chamada.
@@ -116,7 +125,7 @@ public class ChamadaService {
 		return result;
 	}
 	/**
-	 * Conta nº faltas
+	 * Conta num faltas
 	 * @param id
 	 * @return
 	 */
@@ -124,6 +133,19 @@ public class ChamadaService {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
 		long result = dao.countFaltas(id);
+		pc.commitAndClose();
+		return result;
+		
+	}
+	/**
+	 * Conta num presencas
+	 * @param id
+	 * @return
+	 */
+	public long countPresencas(int id){
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		long result = dao.countPresencas(id);
 		pc.commitAndClose();
 		return result;
 		
@@ -156,5 +178,47 @@ public class ChamadaService {
 		pc.commitAndClose();
 		return result;
 	}
-	
+
+	public List<Chamada> listarFaltasSemana(int idAluno, int dia, int mes) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		List<Chamada> result = dao.getFaltasSemana(idAluno, dia, mes);
+				
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Chamada> dataPresenca(int id, Calendar cal) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		List<Chamada> result = dao.dataPresenca(id, cal);
+				
+		pc.commitAndClose();
+		return result;
+	}
+
+	public long countFaltasAno(int idAluno, int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		long result = dao.countFaltasAno(idAluno, ano);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Compensacao> compensacaoAluno(int idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		List<Compensacao> result = dao.compensacaoAluno(idAluno);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public long countCompensacao(Integer idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		ChamadaDAO dao = DAOFactory.getChamadaDAO(pc);
+		long result = dao.countCompensacao(idAluno);
+		pc.commitAndClose();
+		return result;
+	}
+
 }
