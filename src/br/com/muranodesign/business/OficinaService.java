@@ -138,4 +138,20 @@ public class OficinaService {
 		pc.commitAndClose();
 		return result;
 	}
+
+	public long contTipo(int tipo) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		OficinaDAO dao = DAOFactory.getOficinaDAO(pc);
+		long result = dao.contTipo(tipo);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public int deletarOficinaSemProfessor() {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		OficinaDAO dao = DAOFactory.getOficinaDAO(pc);
+		int result = dao.deletarOficinaSemProfessor();
+		pc.commitAndClose();
+		return result;
+	}
 }
