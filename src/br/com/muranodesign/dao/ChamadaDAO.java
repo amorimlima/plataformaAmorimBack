@@ -9,11 +9,13 @@
  */
 package br.com.muranodesign.dao;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import br.com.muranodesign.model.Aluno;
 import br.com.muranodesign.model.Chamada;
+import br.com.muranodesign.model.Compensacao;
 
 
 // TODO: Auto-generated Javadoc
@@ -70,11 +72,18 @@ public interface ChamadaDAO {
 		
 	
 		/**
-		 * Listar nº de faltas
+		 * Listar num de faltas
 		 * @param id
 		 * @return
 		 */
 		public long countFaltas(int id);
+		
+		/**
+		 * Listar num de presencas
+		 * @param id
+		 * @return
+		 */
+		public long countPresencas(int id);
 	
 		/**
 		 * Verifica se existe precenca na data indicada
@@ -89,6 +98,18 @@ public interface ChamadaDAO {
 		 * @return
 		 */
 		public List<Chamada> dataPresencaAtual(int id, Date data);
+
+		public List<Chamada> getFaltasSemana(int idAluno, int dia, int mes);
+
+		public List<Chamada> dataPresenca(int id, Calendar cal);
+
+		public List<Chamada> listBetween(int idAluno, Date startDate, Date endDate);
+
+		public long countFaltasAno(int idAluno, int ano);
+
+		public List<Compensacao> compensacaoAluno(int idAluno);
+
+		public long countCompensacao(Integer idAluno);
 	
 
 }

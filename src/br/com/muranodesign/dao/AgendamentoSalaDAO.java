@@ -50,6 +50,10 @@ public interface AgendamentoSalaDAO {
 	 * @return
 	 */
 	public List<AgendamentoSala> listarValidacao(int dia, int sala, long hora);
+
+	public List<AgendamentoSala> listarRotina(int idrotina);
+
+	public List<AgendamentoSala> listarDiaHora(int idDiaSemana, long hora);
 	
 
 }

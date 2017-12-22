@@ -64,6 +64,8 @@ public interface AlunoAgrupamentoDAO {
 	 * @return
 	 */
 	public List<AlunoAgrupamento> listarAluno(int idAluno);
+
+	public List<AlunoAgrupamento> listarLikeAluno(String nome);
 	
 
 }
