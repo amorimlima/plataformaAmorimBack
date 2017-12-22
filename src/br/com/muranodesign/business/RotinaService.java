@@ -5,6 +5,8 @@ import java.util.List;
 import br.com.muranodesign.dao.DAOFactory;
 import br.com.muranodesign.dao.RotinaDAO;
 import br.com.muranodesign.hibernate.impl.PersistenceContext;
+import br.com.muranodesign.model.Agrupamento;
+import br.com.muranodesign.model.Oficina;
 import br.com.muranodesign.model.Rotina;
 
 public class RotinaService {
@@ -105,10 +107,42 @@ public class RotinaService {
 	 * @param idAgrupamento
 	 * @return
 	 */
-	public List<Rotina> listarPorAgrupamento(int idAgrupamento){
+	public List<Oficina> listarPorAgrupamento(int idAgrupamento){
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		RotinaDAO dao = DAOFactory.getRotinaDAO(pc);
-		List<Rotina> result = dao.listarPorAgrupamento(idAgrupamento);
+		List<Oficina> result = dao.listarPorAgrupamento(idAgrupamento);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Rotina> listarRotinaAlunoDia(int idagrupamento, int iddiaSemana) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RotinaDAO dao = DAOFactory.getRotinaDAO(pc);
+		List<Rotina> result = dao.listarRotinaAlunoDia(idagrupamento, iddiaSemana);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Rotina> ListarRotinaOficinaDia(int idoficina, int idDiaSemana) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RotinaDAO dao = DAOFactory.getRotinaDAO(pc);
+		List<Rotina> result = dao.listarRotinaOficinaDia(idoficina, idDiaSemana);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Rotina> ListarRotinaTutoriaDia(Integer idtutoria, int idDiaSemana) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RotinaDAO dao = DAOFactory.getRotinaDAO(pc);
+		List<Rotina> result = dao.listarRotinaTutoriaDia(idtutoria, idDiaSemana);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<Agrupamento> listarAgrupamentoPorOficina(int idOficina) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		RotinaDAO dao = DAOFactory.getRotinaDAO(pc);
+		List<Agrupamento> result = dao.listarAgrupamentoPorOficina(idOficina);
 		pc.commitAndClose();
 		return result;
 	}
