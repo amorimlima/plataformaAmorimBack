@@ -73,4 +73,20 @@ public class MuralCoordenacaoService {
 		return p;
 	}
 
+	public List<MuralCoordenacao> listarProfessor(int idProfessor) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		MuralCoordenacaoDAO dao = DAOFactory.getMuralCoordenacaoDAO(pc);
+		List<MuralCoordenacao> result =  dao.listarProfessor(idProfessor);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<MuralCoordenacao> listarPerfil(int perfil) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		MuralCoordenacaoDAO dao = DAOFactory.getMuralCoordenacaoDAO(pc);
+		List<MuralCoordenacao> result =  dao.listarPerfil(perfil);
+		pc.commitAndClose();
+		return result;
+	}
+
 }
