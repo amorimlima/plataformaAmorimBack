@@ -21,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -58,8 +59,19 @@ public class Grupo implements Serializable {
     @JoinColumn(name = "lider", referencedColumnName = "ID_ALUNO")
     @ManyToOne
     private Aluno lider;
+    @JoinColumn(name = "periodo", referencedColumnName = "idperiodo")
+    @OneToOne
+    private Periodo periodo;
 
-    public Grupo() {
+    public Periodo getPeriodo() {
+		return periodo;
+	}
+
+	public void setPeriodo(Periodo periodo) {
+		this.periodo = periodo;
+	}
+
+	public Grupo() {
     }
 
     public Grupo(Integer idgrupo) {

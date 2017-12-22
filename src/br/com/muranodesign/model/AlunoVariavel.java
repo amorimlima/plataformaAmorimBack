@@ -27,6 +27,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hibernate.annotations.NamedNativeQueries;
+import org.hibernate.annotations.NamedNativeQuery;
+
 /**
  *
  * @author rogerio
@@ -40,6 +43,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "AlunoVariavel.findByIdalunoVariavel", query = "SELECT a FROM AlunoVariavel a WHERE a.idalunoVariavel = :idalunoVariavel"),
     @NamedQuery(name = "AlunoVariavel.findByInicio", query = "SELECT a FROM AlunoVariavel a WHERE a.inicio = :inicio"),
     @NamedQuery(name = "AlunoVariavel.findByProgramaSocial", query = "SELECT a FROM AlunoVariavel a WHERE a.programaSocial = :programaSocial")})
+@NamedNativeQueries({
+	@NamedNativeQuery(name = "listarAnoNovo", query = "SELECT * FROM aluno_variavel WHERE ano_letivo = 61 AND ativo = 1", resultClass = AlunoVariavel.class)
+})
 public class AlunoVariavel implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -75,8 +81,19 @@ public class AlunoVariavel implements Serializable {
     @JoinColumn(name = "grupo", referencedColumnName = "idgrupo")
     @ManyToOne
     private Grupo grupo;
+    
+    @Column(name = "verificarRoteiros")
+    private int verificarRoteiros;
 
-    public AlunoVariavel() {
+    public int getVerificarRoteiros() {
+		return verificarRoteiros;
+	}
+
+	public void setVerificarRoteiros(int verificarRoteiros) {
+		this.verificarRoteiros = verificarRoteiros;
+	}
+
+	public AlunoVariavel() {
     }
 
     public AlunoVariavel(Integer idalunoVariavel) {

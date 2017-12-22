@@ -27,6 +27,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hibernate.annotations.NamedNativeQueries;
+import org.hibernate.annotations.NamedNativeQuery;
+
 /**
  *
  * @author rogerio
@@ -41,6 +44,25 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "PlanejamentoRoteiro.findByDataStatusPlanejado", query = "SELECT p FROM PlanejamentoRoteiro p WHERE p.dataStatusPlanejado = :dataStatusPlanejado"),
     @NamedQuery(name = "PlanejamentoRoteiro.findByDataStatusEntregue", query = "SELECT p FROM PlanejamentoRoteiro p WHERE p.dataStatusEntregue = :dataStatusEntregue"),
     @NamedQuery(name = "PlanejamentoRoteiro.findByDataStatusVisto", query = "SELECT p FROM PlanejamentoRoteiro p WHERE p.dataStatusVisto = :dataStatusVisto")})
+@NamedNativeQueries({
+	@NamedNativeQuery(
+			name = "countCompletosTutoria",
+			query = "SELECT * FROM planejamento_roteiro pr " +
+					"JOIN aluno al ON al.ID_ALUNO = pr.id_aluno " +
+					"JOIN aluno_variavel av ON av.aluno = al.ID_ALUNO " +
+					"JOIN grupo grp ON grp.idgrupo = av.grupo " +
+					"WHERE YEAR(pr.data_status_planejado) = YEAR(CURRENT_DATE)  AND pr.status = 2 AND grp.tutoria = :idTutoria",
+			resultClass = PlanejamentoRoteiro.class),
+	@NamedNativeQuery(
+			name = "countCorrigidosTutoria",
+			query = "SELECT * FROM planejamento_roteiro pr " +
+					"JOIN aluno al ON al.ID_ALUNO = pr.id_aluno " +
+					"JOIN aluno_variavel av ON av.aluno = al.ID_ALUNO " +
+					"JOIN grupo grp ON grp.idgrupo = av.grupo " +
+					"WHERE YEAR(pr.data_status_planejado) = YEAR(CURRENT_DATE)  AND pr.status = 3 AND grp.tutoria = :idTutoria",
+			resultClass = PlanejamentoRoteiro.class)
+})
+
 public class PlanejamentoRoteiro implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -40,9 +41,21 @@ public class Rotina implements Serializable{
 	 
 	 @OneToOne
 	 private AnoLetivo anoLetivo;
+	 
+	 @OneToOne
+	 @JoinColumn(name = "tutoria", referencedColumnName = "idtutoria")
+	 private Tutoria tutoria;
 	 /*
 	 @OneToOne
 	 private Salas sala;*/
+
+	public Tutoria getTutoria() {
+		return tutoria;
+	}
+
+	public void setTutoria(Tutoria tutoria) {
+		this.tutoria = tutoria;
+	}
 
 	public int getIdrotina() {
 		return Idrotina;

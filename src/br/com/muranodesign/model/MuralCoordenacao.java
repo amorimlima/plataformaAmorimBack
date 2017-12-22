@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -32,11 +34,35 @@ public class MuralCoordenacao implements Serializable{
 	private String mensagem;
 	
 	@OneToOne
-	 private ProfessorFuncionario professor;
+	private ProfessorFuncionario professor;
 	
+	@ManyToOne
+	@JoinColumn(name = "perfil", referencedColumnName = "idperfil")
+	private Perfil perfil;
+	
+	@ManyToOne
+	@JoinColumn(name = "periodo", referencedColumnName = "idperiodo")
+	private Periodo periodo;
+	
+	public Perfil getPerfil() {
+		return perfil;
+	}
+
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
+	}
+
+	public Periodo getPeriodo() {
+		return periodo;
+	}
+
+	public void setPeriodo(Periodo periodo) {
+		this.periodo = periodo;
+	}
+
 	@Basic(optional = false)
-	 @Column(name = "data")
-	 @Temporal(TemporalType.DATE)
+	@Column(name = "data")
+	@Temporal(TemporalType.DATE)
 	private Date data;
 	
 	@Basic(optional = false)

@@ -9,7 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -32,23 +33,23 @@ public class Mural implements Serializable{
 	 @Column(name = "mensagem")
 	 private String mensagem;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn(name = "professor", referencedColumnName = "idprofessor_funcionario")
 	 private ProfessorFuncionario professor;
-
-	 @OneToOne
-	 private Oficina oficina;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn(name = "agrupamento", referencedColumnName = "Idagrupamento")
 	 private Agrupamento agrupamento;
-	 
-	 @OneToOne
-	 private Grupo grupo;
 	 
 	 @Column(name = "tutoria")
 	 private int tutoria;
-
-	 /*@OneToOne
-	 private AlunoVariavel aluno;*/
+	 
+	 @Column(name = "todos")
+	 private int todos;
+	 
+	 @ManyToOne
+	 @JoinColumn(name = "periodo", referencedColumnName = "idperiodo")
+	 private Periodo periodo;
 	 
 	 @Basic(optional = false)
 	 @Column(name = "data")
@@ -79,14 +80,6 @@ public class Mural implements Serializable{
 		this.professor = professor;
 	}
 
-	/*public AlunoVariavel getAluno() {
-		return aluno;
-	}
-
-	public void setAluno(AlunoVariavel aluno) {
-		this.aluno = aluno;
-	}*/
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
@@ -98,13 +91,21 @@ public class Mural implements Serializable{
 	public void setData(Date data) {
 		this.data = data;
 	}
-	
-	 public Oficina getOficina() {
-		return oficina;
+
+	public int getTodos() {
+		return todos;
 	}
 
-	public void setOficina(Oficina oficina) {
-		this.oficina = oficina;
+	public void setTodos(int todos) {
+		this.todos = todos;
+	}
+
+	public Periodo getPeriodo() {
+		return periodo;
+	}
+
+	public void setPeriodo(Periodo periodo) {
+		this.periodo = periodo;
 	}
 
 	public Agrupamento getAgrupamento() {
@@ -121,14 +122,6 @@ public class Mural implements Serializable{
 
 	public void setTutoria(int tutoria) {
 		this.tutoria = tutoria;
-	}
-
-	public Grupo getGrupo() {
-		return grupo;
-	}
-
-	public void setGrupo(Grupo grupo) {
-		this.grupo = grupo;
 	}
 	 
 }

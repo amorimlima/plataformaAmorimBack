@@ -51,8 +51,8 @@ public class AnoEstudo implements Serializable {
     private String ano;
     
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "anoEstudo")
-    private Collection<AlunoVariavel> alunoVariavelCollection;
+    /*@OneToMany(cascade = CascadeType.ALL, mappedBy = "anoEstudo")
+    private Collection<AlunoVariavel> alunoVariavelCollection;*/
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "anoEstudo")
     private Collection<Roteiro> roteiroCollection;
@@ -85,14 +85,14 @@ public class AnoEstudo implements Serializable {
         this.ano = ano;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<AlunoVariavel> getAlunoVariavelCollection() {
         return alunoVariavelCollection;
     }
 
     public void setAlunoVariavelCollection(Collection<AlunoVariavel> alunoVariavelCollection) {
         this.alunoVariavelCollection = alunoVariavelCollection;
-    }
+    }*/
 
     @XmlTransient
     public Collection<Roteiro> getRoteiroCollection() {

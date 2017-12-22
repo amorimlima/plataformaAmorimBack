@@ -56,11 +56,23 @@ public class Chamada implements Serializable {
     @JoinColumn(name = "aluno", referencedColumnName = "ID_ALUNO")
     @ManyToOne(optional = false)
     private Aluno aluno;
+    
+    @JoinColumn(name = "compensacao", referencedColumnName = "idCompensacao")
+    @ManyToOne
+    private Compensacao compensacao;
 
     public Chamada() {
     }
 
-    public Chamada(Integer idchamada) {
+    public Compensacao getCompensacao() {
+		return compensacao;
+	}
+
+	public void setCompensacao(Compensacao compensacao) {
+		this.compensacao = compensacao;
+	}
+
+	public Chamada(Integer idchamada) {
         this.idchamada = idchamada;
     }
 

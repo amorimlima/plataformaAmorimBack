@@ -9,7 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -41,11 +42,29 @@ public class Blog implements Serializable{
 	 @Column(name = "imagem")
 	 private String imagem;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn(name = "oficina", referencedColumnName = "Idoficina")
 	 private Oficina oficina;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn(name = "anoEstudo", referencedColumnName = "idano_estudo")
 	 private AnoEstudo anoEstudo;
+	 
+	 @ManyToOne
+	 @JoinColumn(name = "agrupamento", referencedColumnName = "Idagrupamento")
+	 private Agrupamento agrupamento;
+	 
+	 @ManyToOne
+	 @JoinColumn(name = "autor", referencedColumnName = "idprofessor_funcionario")
+	 private ProfessorFuncionario autor;
+
+	public ProfessorFuncionario getAutor() {
+		return autor;
+	}
+
+	public void setAutor(ProfessorFuncionario autor) {
+		this.autor = autor;
+	}
 
 	public int getIdblog() {
 		return Idblog;
@@ -105,6 +124,14 @@ public class Blog implements Serializable{
 
 	public void setData(Date data) {
 		this.data = data;
+	}
+	
+	public Agrupamento getAgrupamento() {
+		return agrupamento;
+	}
+
+	public void setAgrupamento(Agrupamento agrupamento) {
+		this.agrupamento = agrupamento;
 	}
 
 	

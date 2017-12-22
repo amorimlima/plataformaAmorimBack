@@ -29,6 +29,9 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.hibernate.annotations.NamedNativeQueries;
+import org.hibernate.annotations.NamedNativeQuery;
+
 /**
  *
  * @author rogerio
@@ -40,6 +43,27 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Objetivo.findAll", query = "SELECT o FROM Objetivo o"),
     @NamedQuery(name = "Objetivo.findByIdobjetivo", query = "SELECT o FROM Objetivo o WHERE o.idobjetivo = :idobjetivo"),
     @NamedQuery(name = "Objetivo.findByNumero", query = "SELECT o FROM Objetivo o WHERE o.numero = :numero")})
+@NamedNativeQueries({
+	@NamedNativeQuery(
+			name = "countObjetivosAnoTutoria",
+			query = "SELECT * FROM objetivo obj " +
+					"JOIN roteiro rot ON rot.idroteiro = obj.roteiro " +
+					"JOIN aluno_variavel av ON av.ano_estudo = rot.ano_estudo " +
+					"JOIN grupo grp ON grp.idgrupo = av.grupo " +
+					"WHERE grp.tutoria = :idTutoria",
+			resultClass = Objetivo.class),
+	@NamedNativeQuery(
+			name = "countObjetivosAtribuicaoTutoria",
+			query = "SELECT * FROM objetivo obj " +
+					"JOIN roteiro rot ON rot.idroteiro = obj.roteiro " +
+					"JOIN atribuicao_roteiro_extra are ON are.roteiro = rot.idroteiro " +
+					"JOIN aluno al ON al.ID_ALUNO = are.aluno " +
+					"JOIN aluno_variavel av ON av.aluno = al.ID_ALUNO " +
+					"JOIN grupo grp ON grp.idgrupo = av.grupo " +
+					"WHERE grp.tutoria = :idTutoria",
+			resultClass = Aluno.class)
+					
+})
 public class Objetivo implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
