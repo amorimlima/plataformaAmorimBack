@@ -58,7 +58,7 @@ public class AuthFilter implements ContainerRequestFilter {
  
         //If the user does not have the right (does not provide any HTTP Basic Auth)
         if(auth == null){
-        	logger.debug("Cabecario Vazio");
+        	logger.debug("Cabecalho Vazio");
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
  
