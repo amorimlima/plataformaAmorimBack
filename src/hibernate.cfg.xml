@@ -5,11 +5,14 @@
 		
 		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost/amorim_prodV2</property>
+		<property name="hibernate.connection.username">murano</property>
+		<property name="hibernate.connection.password">Murano.2017</property>
 		
 		 
-		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/temp</property>
+		<!--<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/temp</property>
 		<property name="hibernate.connection.username">root</property>
-		<property name="hibernate.connection.password"></property>
+		<property name="hibernate.connection.password"></property>-->
 		
 		<property name="hibernate.cache.use_second_level_cache">true</property>
 				
@@ -21,6 +24,9 @@
 	
 		
 		<!--<property name="hibernate.hbm2ddl.auto">update</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
+		<propertsy name="hibernate.connection.url">jdbc:mysql://177.55.99.90:3306/amorim_prod_testeV2</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
 		
 		<property name="show_sql">true</property> 
 		<property name="hibernate.hbm2ddl.auto">update</property>
@@ -36,6 +42,12 @@
 		amorim_prod
 		amorim_prod_teste
 		
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password">amorim_prod</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost/amorim_dev</property>
+		<property name="hibernate.connection.url">jdbc:mysql://177.55.99.90:3306/amorim_prodV2</property>
+		<property name="hibernate.connection.url">jdbc:mysql://177.55.99.90:3306/amorim_test</property>
+		<property name="hibernate.connection.url">jdbc:mysql://177.55.99.90:3306/amorim_dev</property>
 		<property name="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.EhCacheRegionFactory</property>
 		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory </property>
 		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property> 
@@ -111,16 +123,23 @@
 		<mapping class="br.com.muranodesign.model.Mural" />
 		<mapping class="br.com.muranodesign.model.MuralAluno" />
 		<mapping class="br.com.muranodesign.model.Cores" />
-		<mapping class="br.com.muranodesign.model.RoteiroAula" />
-		<mapping class="br.com.muranodesign.model.ObjetivoAula" />
 		<mapping class="br.com.muranodesign.model.Menu" />
 		<mapping class="br.com.muranodesign.model.MenuPerfil" />
 		<mapping class="br.com.muranodesign.model.Blog" />
-		<mapping class="br.com.muranodesign.model.PlanoAula" />
 		<mapping class="br.com.muranodesign.model.PlanejamentoAula" />
 		<mapping class="br.com.muranodesign.model.JornadaProfessor" />
 		<mapping class="br.com.muranodesign.model.MuralCoordenacao" />
 		<mapping class="br.com.muranodesign.model.PendenciasProducaoAluno" />
+		<mapping class="br.com.muranodesign.model.TipoOficina" />
+		<mapping class="br.com.muranodesign.model.JeiffPea" />
+		<mapping class="br.com.muranodesign.model.Compensacao"/>
+		<mapping class="br.com.muranodesign.model.LicensaProfessor" />
+		<mapping class="br.com.muranodesign.model.EmprestimoLivro" />
+		<mapping class="br.com.muranodesign.model.Aprovacao" />
+		<mapping class="br.com.muranodesign.model.Conceito" />
+		<mapping class="br.com.muranodesign.model.AlunoConceito" />
+		<mapping class="br.com.muranodesign.model.PlanoRecurso" />
+		<mapping class="br.com.muranodesign.model.PlanoAgrupamento" />
 		
 		
 	</session-factory>
