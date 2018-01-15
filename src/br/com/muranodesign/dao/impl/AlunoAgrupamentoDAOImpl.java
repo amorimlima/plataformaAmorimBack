@@ -3,6 +3,8 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.AlunoAgrupamentoDAO;
@@ -112,6 +114,17 @@ public class AlunoAgrupamentoDAOImpl extends AbstractHibernateDAO implements Alu
 		Criteria criteria = getSession().createCriteria(AlunoAgrupamento.class);
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idalunoVariavel", idAluno));
+		List<AlunoAgrupamento> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<AlunoAgrupamento> listarLikeAluno(String nome) {
+		Criteria criteria = getSession().createCriteria(AlunoAgrupamento.class);
+		criteria.createAlias("aluno", "alunoVariavel");
+		criteria.createAlias("alunoVariavel.aluno", "aluno");
+		criteria.add(Restrictions.like("aluno.nome", nome, MatchMode.ANYWHERE));
+		criteria.setProjection(Projections.distinct(Projections.property("agrupamento")));
 		List<AlunoAgrupamento> result = criteria.list();
 		return result;
 	}

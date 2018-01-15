@@ -59,7 +59,9 @@ public class RecursoAprendizagem implements Serializable {
     private String arquivo;
     @Column(name = "link")
     private String link;
-    @JoinColumn(name = "tipo_recurso_aprendizagem", referencedColumnName = "idtipo_recurso_aprendizagem")
+    @Column(name = "midiaLivro")
+    private Integer midiaLivro;
+	@JoinColumn(name = "tipo_recurso_aprendizagem", referencedColumnName = "idtipo_recurso_aprendizagem")
     @ManyToOne
     private TipoRecursoAprendizagem tipoRecursoAprendizagem;
     @JoinColumn(name = "materia", referencedColumnName = "idmateria")
@@ -147,6 +149,14 @@ public class RecursoAprendizagem implements Serializable {
     public void setRoteiro(Roteiro roteiro) {
         this.roteiro = roteiro;
     }
+    
+    public Integer getMidiaLivro() {
+		return midiaLivro;
+	}
+
+	public void setMidiaLivro(Integer midiaLivro) {
+		this.midiaLivro = midiaLivro;
+	}
 
     @Override
     public int hashCode() {

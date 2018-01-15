@@ -1,11 +1,6 @@
 package br.com.muranodesign.resources;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -17,12 +12,17 @@ import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
 
-import br.com.muranodesign.business.ObjetivoAulaService;
+import br.com.muranodesign.business.OficinaService;
 import br.com.muranodesign.business.PlanejamentoAulaService;
-import br.com.muranodesign.business.PlanoAulaService;
 import br.com.muranodesign.business.ProfessorFuncionarioService;
 import br.com.muranodesign.model.PlanejamentoAula;
+import br.com.muranodesign.util.StringUtil;
 
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("PlanejamentoAula")
 public class PlanejamentoAulaResource {
 	private Logger logger = Logger.getLogger(PlanejamentoAulaResource.class.getName());
@@ -32,16 +32,16 @@ public class PlanejamentoAulaResource {
 	public String eventoAction(
 			@FormParam("action") String action,
 			@FormParam("id") int id,
-			@FormParam("idPlanoAula") int idPlanoAula,
-			@FormParam("idObjetivoAula") int idObjetivoAula,
-			@FormParam("status") String status,
+			@FormParam("oficina") int oficina,
+			@FormParam("data_inicio") String data_inicio,
+			@FormParam("data_fim") String data_fim,
+			@FormParam("objetivo") String objetivo,
+			@FormParam("metodologia") String metodologia,
+			@FormParam("conteudo") String conteudo,
+			@FormParam("atividades") String atividades,
 			@FormParam("idProfessor") int idProfessor) throws ParseException{
 		
-		//Date data = null;
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		
-		String k = new SimpleDateFormat("dd/MM/yyyy").format(new Date()).toString();  
-		Date date = (Date)formatter.parse(k);
+		StringUtil stringUtil = new StringUtil();
 		
 		PlanejamentoAula resultado = new PlanejamentoAula();
 		
@@ -49,84 +49,70 @@ public class PlanejamentoAulaResource {
 			resultado = new PlanejamentoAulaService().deletarPlanejamentoAula(new PlanejamentoAulaService().listarkey(id).get(0));
 		}
 		else if(action.equals("create")){
-			PlanejamentoAula planejamento = new PlanejamentoAula();
-			planejamento.setPlanoAula(new PlanoAulaService().listarkey(idPlanoAula).get(0));
-			planejamento.setObjetivoAula(new ObjetivoAulaService().listarkey(idObjetivoAula).get(0));
-			planejamento.setStatus(status);
-			planejamento.setProfessor(new ProfessorFuncionarioService().listarkey(idProfessor).get(0));
-			planejamento.setData(date);
 			
-			resultado = new PlanejamentoAulaService().criarPlanejamentoAula(planejamento);
+			resultado.setOficina(new OficinaService().listarkey(oficina).get(0));
+			resultado.setData_inicio(stringUtil.converteStringData(data_inicio));
+			resultado.setData_fim(stringUtil.converteStringData(data_fim));
+			resultado.setObjetivo(objetivo);
+			resultado.setMetodologia(metodologia);
+			resultado.setConteudo(conteudo);
+			resultado.setAtividades(atividades);
+			resultado.setProfessor(new ProfessorFuncionarioService().listarkey(idProfessor).get(0));
+			
+			resultado = new PlanejamentoAulaService().criarPlanejamentoAula(resultado);
 			
 		}else if(action.equals("update")){
-			PlanejamentoAula planejamento = new  PlanejamentoAulaService().listarkey(id).get(0);
-			planejamento.setPlanoAula(new PlanoAulaService().listarkey(idPlanoAula).get(0));
-			planejamento.setObjetivoAula(new ObjetivoAulaService().listarkey(idObjetivoAula).get(0));
-			planejamento.setStatus(status);
-			planejamento.setProfessor(new ProfessorFuncionarioService().listarkey(idProfessor).get(0));
-			planejamento.setData(date);
 			
+			resultado = new  PlanejamentoAulaService().listarkey(id).get(0);
 			
-			resultado = new PlanejamentoAulaService().atualizarPlanejamentoAula(planejamento);
+			resultado.setOficina(new OficinaService().listarkey(oficina).get(0));
+			resultado.setData_inicio(stringUtil.converteStringData(data_inicio));
+			resultado.setData_fim(stringUtil.converteStringData(data_fim));
+			resultado.setObjetivo(objetivo);
+			resultado.setMetodologia(metodologia);
+			resultado.setConteudo(conteudo);
+			resultado.setAtividades(atividades);
+			resultado.setProfessor(new ProfessorFuncionarioService().listarkey(idProfessor).get(0));
+			
+			resultado = new PlanejamentoAulaService().atualizarPlanejamentoAula(resultado);
 		}
 		
 		return Integer.toString(resultado.getIdplanejamento_aula());
 	}
 	
-	
 	@Path("listarProfessor/{idProfessor}")
 	@GET
 	@Produces("application/json")
 	public List<PlanejamentoAula> getlistarProfessor(@PathParam("idProfessor") int idProfessor){
-		logger.debug("Listar PlanejamentoAula ...");
+		logger.debug("Listar PlanejamentoAula Professor: "+idProfessor+" ...");
 		List<PlanejamentoAula> resultado;
 		 resultado = new PlanejamentoAulaService().listarProfessor(idProfessor);
 		 logger.debug("QTD PlanejamentoAula: " +  resultado.size());
 		return resultado;
 	}
 	
-	@Path("listarProfessorObjetivoAula/{idProfessor}/{idObjetivoAula}/{idplanoAula}")
+	@Path("listarProfessorOficina/{idProfessor}/{idOficina}")
 	@GET
 	@Produces("application/json")
-	public String getlistarProfessorObjetivoAula(@PathParam("idProfessor") int idProfessor,@PathParam("idObjetivoAula") int idObjetivoAula,@PathParam("idplanoAula") int idplanoAula){
-		List<PlanejamentoAula> planejamnto = new PlanejamentoAulaService().listarProfessorObjetivoAula(idProfessor, idObjetivoAula, idplanoAula);
-		String status;
-		if(!planejamnto.isEmpty()){
-			status = planejamnto.get(0).getStatus();
-		}else{
-			status = "0";
-		}
-		
-		return status;
-	}
-	
-	@Path("listarIdProfessorObjetivoAula/{idProfessor}/{idObjetivoAula}/{idplanoAula}")
-	@GET
-	@Produces("application/json")
-	public String getlistarIdProfessorObjetivoAula(@PathParam("idProfessor") int idProfessor,@PathParam("idObjetivoAula") int idObjetivoAula,@PathParam("idplanoAula") int idplanoAula){
-		List<PlanejamentoAula> planejamnto = new PlanejamentoAulaService().listarProfessorObjetivoAula(idProfessor, idObjetivoAula, idplanoAula);
-		String status;
-		if(!planejamnto.isEmpty()){
-			status = Integer.toString(planejamnto.get(0).getIdplanejamento_aula());
-		}else{
-			status = "0";
-		}
-		
-		return status;
-	}
-	
-	
-	@Path("listarPlanoAula/{idPlanoAula}")
-	@GET
-	@Produces("application/json")
-	public List<PlanejamentoAula> getlistarPlanoAula(@PathParam("idPlanoAula") int idPlanoAula){
-		logger.debug("Listar PlanejamentoAula ...");
+	public List<PlanejamentoAula> getlistarProfessorOficina(@PathParam("idProfessor") int idProfessor, @PathParam("idOficina") int idOficina){
+		logger.debug("Listar PlanejamentoAula Professor: "+idProfessor+" Oficina: "+idOficina+" ...");
 		List<PlanejamentoAula> resultado;
-		resultado = new PlanejamentoAulaService().listarPlanoAula(idPlanoAula);
-		 logger.debug("QTD PlanejamentoAula: " +  resultado.size());
+		resultado = new PlanejamentoAulaService().listarProfessorOficina(idProfessor, idOficina);
+		logger.debug("QTD PlanejamentoAula: " +  resultado.size());
 		return resultado;
 	}
 	
+	@Path("ListarData/{dataInicio}/{dataFim}/{idProfessor}")
+	@GET
+	@Produces("application/json")
+	public List<PlanejamentoAula> getDataIntervalo(@PathParam("dataInicio") String dataInicio, @PathParam("dataFim") String dataFim, @PathParam("idProfessor") int idProfessor) throws ParseException{
+		logger.debug("Listar PlanejamentoAula inicio: "+dataInicio+" fim: "+dataFim);
+		List<PlanejamentoAula> resultado;
+		StringUtil stringUtil = new StringUtil();
+		resultado = new PlanejamentoAulaService().listarIntervalo(stringUtil.converteStringData(dataInicio), stringUtil.converteStringData(dataFim), idProfessor);
+		logger.debug("QTD PlanejamentoAula: " +  resultado.size());
+		return resultado;
+	}
 	
 	@GET
 	@Produces("application/json")
@@ -138,31 +124,16 @@ public class PlanejamentoAulaResource {
 		return resultado;
 	}
 	
-	
-	@Path("listarStatus/{idPlanoAula}")
+	@Path("{id}")
 	@GET
 	@Produces("application/json")
-	public List<Hashtable<String, String>> getlistarStatus(@PathParam("idPlanoAula") int idPlanoAula){
-		
-		List<Hashtable<String, String>> list = new ArrayList<Hashtable<String,String>>();
-		
+	public List<PlanejamentoAula> getPlanejamentoAula(@PathParam("id") int id) {
 		logger.debug("Listar PlanejamentoAula ...");
 		List<PlanejamentoAula> resultado;
-		resultado = new PlanejamentoAulaService().listarPlanoAula(idPlanoAula);
-		
-		for (PlanejamentoAula planejamentoAula : resultado) {
-			
-			
-			Hashtable<String, String> hash = new Hashtable<String, String>();
-			
-			hash.put("objetivo", planejamentoAula.getObjetivoAula().getObjetivo());
-			hash.put("status", planejamentoAula.getStatus());
-			
-			list.add(hash);	
-		}
-
-		return list;
+		 resultado = new PlanejamentoAulaService().listarkey(id);
+		 logger.debug("QTD OficinaProfessor : " +  resultado.size());
+		return resultado;
 	}
 	
-
+	
 }

@@ -312,6 +312,45 @@ public class LoginResource {
 		return retorno;
 	}
 	
+	/**
+	 * Alterar a senha do aluno
+	 * @param login
+	 * @param senhaAnt
+	 * @param senha
+	 * @param senhaNova
+	 * @param id
+	 * @return id
+	 */
+	@Path("alterarSenhaAluno")
+	@POST
+	@Produces("text/plain")
+	public String alterarSenhaAluno(@FormParam("senha") String senha,
+			@FormParam("idAluno") int idAluno) {
+		logger.info("Alterar Senha Aluno ..." + idAluno);
+
+		String retorno ="";
+		MessageDigest m;
+		Usuario resultado;
+		resultado = new UsuarioService().listaAluno(idAluno).get(0);
+
+		try {
+			m = MessageDigest.getInstance("MD5");
+			String senhaMD5 = new BigInteger(1, m.digest()).toString(16);
+
+			UsuarioService UserService = new UsuarioService();
+			m.update(senha.getBytes(), 0, senha.length());
+			senhaMD5 = new BigInteger(1, m.digest()).toString(16);
+			resultado.setSenha(senhaMD5);
+			UserService.atualizarUsuario(resultado);
+			retorno = "ok";
+			
+
+		} catch (NoSuchAlgorithmException e) {
+			logger.info("Erro ao realizar login");
+		}
+		return retorno;
+	}
+	
 
 	/**
 	 * 

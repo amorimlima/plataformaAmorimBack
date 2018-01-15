@@ -80,8 +80,8 @@ public class Usuario implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "remetente")
     
     
-    private Collection<Mensagens> mensagensCollection1;
-    @OneToMany(mappedBy = "usuario")
+//    private Collection<Mensagens> mensagensCollection1;
+//    @OneToMany(mappedBy = "usuario")
     
     
     @JoinColumn(name = "aluno", referencedColumnName = "ID_ALUNO")
@@ -170,14 +170,14 @@ public class Usuario implements Serializable {
 
     
 
-    @XmlTransient
-    public Collection<Mensagens> getMensagensCollection1() {
-        return mensagensCollection1;
-    }
-
-    public void setMensagensCollection1(Collection<Mensagens> mensagensCollection1) {
-        this.mensagensCollection1 = mensagensCollection1;
-    }
+//    @XmlTransient
+//    public Collection<Mensagens> getMensagensCollection1() {
+//        return mensagensCollection1;
+//    }
+//
+//    public void setMensagensCollection1(Collection<Mensagens> mensagensCollection1) {
+//        this.mensagensCollection1 = mensagensCollection1;
+//    }
 
     public Aluno getAluno() {
         return aluno;

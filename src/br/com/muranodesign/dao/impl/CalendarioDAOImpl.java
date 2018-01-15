@@ -197,4 +197,65 @@ public class CalendarioDAOImpl extends AbstractHibernateDAO implements Calendari
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Calendario> listarGeralMes(int mes, int ano) {
+		Criteria criteria = getSession().createCriteria(Calendario.class);
+		Calendar primeiroDia = Calendar.getInstance();
+		primeiroDia.set(Calendar.YEAR, ano);
+		primeiroDia.set(Calendar.MONTH, mes - 1);
+		primeiroDia.set(Calendar.DAY_OF_MONTH, 1);
+		Calendar ultimoDia =  Calendar.getInstance();
+		ultimoDia.set(Calendar.YEAR, ano);
+		ultimoDia.set(Calendar.MONTH, mes - 1);
+		ultimoDia.set(Calendar.DAY_OF_MONTH, ultimoDia.getActualMaximum(Calendar.DAY_OF_MONTH));
+		criteria.createAlias("tipoEvento", "tipoEvento");
+		criteria.add(Restrictions.eq("tipoEvento.idtipoEvento", 46));
+		criteria.add(Restrictions.ge("dataInicio", primeiroDia.getTime()));
+		criteria.add(Restrictions.le("dataInicio", ultimoDia.getTime()));
+		criteria.addOrder(Order.asc("dataInicio"));
+		List<Calendario> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Calendario> listFeriados(Calendar dataInicio, Calendar dataFim) {
+		Criteria criteria = getSession().createCriteria(Calendario.class);
+		criteria.add(Restrictions.or(Restrictions.ge("feriado",1),Restrictions.eq("aula",0)));
+		criteria.add(Restrictions.eq("ano", dataInicio.get(Calendar.YEAR)));
+		criteria.add(Restrictions.ge("dataInicio", dataInicio.getTime()));
+		criteria.add(Restrictions.le("dataInicio", dataFim.getTime()));
+		criteria.addOrder(Order.asc("dataInicio"));		
+		List<Calendario> result = criteria.list();		
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Calendario> listarFeriadosSemana(int dia, int mes){
+		Criteria criteria = getSession().createCriteria(Calendario.class);
+		
+		Calendar dataInicio = Calendar.getInstance();
+		dataInicio.set(Calendar.MONTH, mes);
+		dataInicio.set(Calendar.DATE, dia);
+		dataInicio.set(Calendar.WEEK_OF_MONTH, dataInicio.get(Calendar.WEEK_OF_MONTH));
+		dataInicio.set(Calendar.DAY_OF_WEEK, dataInicio.getFirstDayOfWeek());
+		Calendar dataFim =  Calendar.getInstance();
+		dataFim.set(Calendar.MONTH, mes);
+		dataFim.set(Calendar.DATE, dataInicio.get(Calendar.DATE) + 6);
+		
+		criteria.add(Restrictions.or(Restrictions.ge("feriado",1),Restrictions.eq("aula",0)));
+		
+		criteria.add(Restrictions.or((Restrictions.or(
+										Restrictions.between("dataInicio", dataInicio.getTime(), dataFim.getTime()),
+										Restrictions.between("dataFim", dataInicio.getTime(), dataFim.getTime()))),
+									Restrictions.and(Restrictions.lt("dataInicio", dataInicio.getTime()),
+													 Restrictions.gt("dataFim", dataFim.getTime())))
+				);
+		criteria.addOrder(Order.asc("dataInicio"));
+		
+		List<Calendario> result = criteria.list();
+		
+		return result;
+		
+	}
+
 }

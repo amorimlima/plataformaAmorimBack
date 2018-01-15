@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +71,8 @@ public class AlunoVariavelResource {
 	public /*List<AlunoVariavel>*/String getAlunoVariavelhtml(@PathParam("ano") int ano, @PathParam("periodo") int periodo) {
 		logger.info("Listar AlunoVariavel ...");
 		List<AlunoVariavel> resultado;
-		resultado = new AlunoVariavelService().listaAnoEstudoPeriodo(new AnoEstudoService().listarkey(ano).get(0), new PeriodoService().listarkey(periodo).get(0));
+		int anoLetivo = new AnoLetivoService().listarAnoLetivo(Integer.toString(Calendar.getInstance().get(Calendar.YEAR))).get(0).getIdanoLetivo();
+		resultado = new AlunoVariavelService().listaAnoEstudoPeriodo(new AnoEstudoService().listarkey(ano).get(0), new PeriodoService().listarkey(periodo).get(0), anoLetivo);
 		logger.info("QTD AlunoVariavel : " + resultado.size());
 		int tamanho = resultado.size();
 		String HtmlContent = "";
@@ -153,7 +155,7 @@ public class AlunoVariavelResource {
 			}
 		}
 		
-		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarCicloAnoPeriodo(anos, idPeriodo, primeiro, ultimo);
+		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarCicloAnoPeriodoSemGrupo(anos, idPeriodo, primeiro, ultimo);
 		
 		return retorno;		
 		
@@ -209,11 +211,10 @@ public class AlunoVariavelResource {
 		for(int i = 0; i < ciclos.size(); i++) {
 			if(!anos.contains(ciclos.get(i).getAno().getIdanoEstudo())){
 				anos.add(ciclos.get(i).getAno().getIdanoEstudo());
-				
 			}
 		}
 				
-		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarCicloAno(anos, primeiro, ultimo);
+		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarCicloAnoSemGrupo(anos, primeiro, ultimo);
 	
 		return retorno;		
 		
@@ -249,10 +250,50 @@ public class AlunoVariavelResource {
 	@Produces("application/json")
 	public List<AlunoVariavel> getlistarPeriodoRangeObjeto(@PathParam("idPeriodo") int idPeriodo,@PathParam("primeiro") int primeiro,@PathParam("ultimo") int ultimo){
 
-		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarRangePeriodo(idPeriodo, primeiro, ultimo);
+		List<AlunoVariavel> retorno = new AlunoVariavelService().ListarRangePeriodoSemGrupo(idPeriodo, primeiro, ultimo);
 		
 		return retorno;		
 		
+	}
+	
+	@Path("buscarAgrupamentoHtml/{like}")
+	@GET
+	@Produces("application/json")
+	public String buscarAgrupamento(@PathParam("like") String like){
+		
+		String html1 = "";
+		
+		List<AlunoVariavel> retorno = new AlunoVariavelService().listarNomeAluno(like);
+		
+		for (AlunoVariavel alunoVariavel : retorno) {
+		html1 += 	"<div class="+"'Grupo_Aluno_Linha'"+">" +
+			 		"<span class="+"'Nome_Aluno'"+">"+alunoVariavel.getAluno().getNome()+"</span>"+
+			        "<input type="+"'checkbox'"+" id="+"'Aluno_Check_"+alunoVariavel.getIdalunoVariavel()+"' class="+"'Aluno_Ano_Check'" +"/>"+
+			        "<label for="+"'Aluno_Check_"+alunoVariavel.getIdalunoVariavel()+"'>"+
+			        "<span></span>" + 
+					"</label>" +
+					"<span class="+"Ano_Aluno"+">"+alunoVariavel.getAnoEstudo().getAno()+"º ano</span>"+
+          "</div>";
+		}
+		
+				
+		
+		return html1;		
+		
+	}
+	
+	@Path("ListarNomeSemGrupo/{nome}/{idPeriodo}/{idCiclo}")
+	@GET
+	@Produces("application/json")
+	public List<AlunoVariavel> getNome(@PathParam("nome") String nome, @PathParam("idPeriodo") int idPeriodo, @PathParam("idCiclo") int idCiclo){
+		List<CicloAnoEstudo> anosCiclo = new CicloAnoEstudoService().listCiclo(idCiclo);
+		List<Integer> anos = new ArrayList<Integer>();
+		
+		for (CicloAnoEstudo cicloAnoEstudo : anosCiclo) {
+			anos.add(cicloAnoEstudo.getAno().getIdanoEstudo());
+		}
+		
+		return new AlunoVariavelService().listarNomeSemGrupo(nome, idPeriodo, anos);
 	}
 	
 	/**
@@ -366,6 +407,13 @@ public class AlunoVariavelResource {
 		return resultado;
 	}
 	
+	@Path("AlunoAno/{idAluno}/{ano}")
+	@GET
+	@Produces("application/json")
+	public AlunoVariavel getAlunoAno(@PathParam("idAluno") int idAluno, @PathParam("ano") int ano){
+		return new AlunoVariavelService().listarAlunoAno(idAluno, ano).get(0);
+	}
+	
 	/**
 	 * Gerar relatório de aluno variavel
 	 * @param Tutoria
@@ -399,7 +447,11 @@ public class AlunoVariavelResource {
 			@FormParam("Tutoria") int Tutoria,
 			@FormParam("Ano") int Ano,
 			@FormParam("Periodo") int Periodo,
+			@FormParam("Neces") String Neces,
+			@FormParam("Prog") String Prog,
+			@FormParam("Status") String Status,
 			
+			@FormParam("tutoria") String tut,
 			@FormParam("Nome") String Nome,
 			@FormParam("Sexo") String Sexo	,
 			@FormParam("Datanascimento") String Datanascimento,
@@ -418,12 +470,8 @@ public class AlunoVariavelResource {
 			@FormParam("TelefoneCelularMae") String TelefoneCelularMae,
 			@FormParam("TelefoneResidencialMae") String TelefoneResidencialMae,
 			@FormParam("TelefoneComercialMae") String TelefoneComercialMae,
-			@FormParam("emailMae") String emailMae//,
-		//	@FormParam("Caminho") String Caminho
-			
-			
+			@FormParam("emailMae") String emailMae			
 			){
-		
 			 
 			HSSFWorkbook workbook = new HSSFWorkbook();
 			HSSFSheet firstSheet = workbook.createSheet("Relatorio Aluno");
@@ -436,2150 +484,337 @@ public class AlunoVariavelResource {
 				
 			nomeArquivo = new StringUtil().geraNomeAleatorio("xls", 15);
 			fos = new FileOutputStream(new File("/home/tomcat/webapps/files/" + nomeArquivo));
-			//fos = new FileOutputStream(new File("C:/Users/Kevyn/Documents/teste/" + nomeArquivo));
-						
-			// Este trecho obtem uma lista de objetos do tipo CD
-			 
-			// do banco de dados através de um DAO e itera sobre a lista
-			 
-			// criando linhas e colunas em um arquivo Excel com o conteúdo
-			 
-			// dos objetos.
-			 
-			
-			 
-			/* 
-			for (int i = 0; i < 4; i++) {
-			HSSFRow row = firstSheet.createRow(i);
-			 
-			row.createCell((short) 0).setCellValue("primeiro");
-			row.createCell((short) 1).setCellValue("segundo");
-			row.createCell((short) 2).setCellValue("terceito");
-			row.createCell((short) 3).setCellValue("quarto");
-			row.createCell((short) 4).setCellValue("teste");
-			
-			 
-			 
-			} // fim do for
-			 
-		*/
-		
-		
+			//fos = new FileOutputStream(new File("C:/Users/murano/Desktop/Teste/" + nomeArquivo));		
 	
 		HSSFRow row = firstSheet.createRow(0);
 		
 		List<String> retorno = new ArrayList<String>();
 		List<List<String>> listRetorno = new ArrayList<List<String>>();
 		
-		List<AlunoVariavel> alunos = new ArrayList<AlunoVariavel>();
-		List<Grupo> grupo = new ArrayList<Grupo>();
-		
-		//String html = "";
-		//String parte = "";
 		
 		int h = 0;
 		row = firstSheet.createRow(h);
-		row.createCell((short) 0).setCellValue("Nome");
-		row.createCell((short) 1).setCellValue("Sexo");
-		row.createCell((short) 2).setCellValue("Datanascimento");
-		row.createCell((short) 3).setCellValue("Endereco");
-		row.createCell((short) 4).setCellValue("TelefoneResidencial");
-		row.createCell((short) 5).setCellValue("TelefoneCelular");
-		row.createCell((short) 6).setCellValue("email");
-		row.createCell((short) 7).setCellValue("NomeResponsavel");
-		row.createCell((short) 8).setCellValue("ParentescoResponsavel");
-		row.createCell((short) 9).setCellValue("TelefoneResidencialResponsavel");
-		row.createCell((short) 10).setCellValue("TelefoneCelularResponsavel");
-		row.createCell((short) 11).setCellValue("TelefoneComercialResponsavel");
-		row.createCell((short) 12).setCellValue("emailResponsavel");
-		row.createCell((short) 13).setCellValue("NomeMae");
-		row.createCell((short) 14).setCellValue("EnderecoMae");
-		row.createCell((short) 15).setCellValue("TelefoneCelularMae");
-		row.createCell((short) 16).setCellValue("TelefoneResidencialMae");
-		row.createCell((short) 17).setCellValue("TelefoneComercialMae");
-		row.createCell((short) 18).setCellValue("emailMae");
+		row.createCell((short) 0).setCellValue("Tutoria");
+		row.createCell((short) 1).setCellValue("Nome");
+		row.createCell((short) 2).setCellValue("Sexo");
+		row.createCell((short) 3).setCellValue("Datanascimento");
+		row.createCell((short) 4).setCellValue("Endereco");
+		row.createCell((short) 5).setCellValue("TelefoneResidencial");
+		row.createCell((short) 6).setCellValue("TelefoneCelular");
+		row.createCell((short) 7).setCellValue("email");
+		row.createCell((short) 8).setCellValue("NomeResponsavel");
+		row.createCell((short) 9).setCellValue("ParentescoResponsavel");
+		row.createCell((short) 10).setCellValue("TelefoneResidencialResponsavel");
+		row.createCell((short) 11).setCellValue("TelefoneCelularResponsavel");
+		row.createCell((short) 12).setCellValue("TelefoneComercialResponsavel");
+		row.createCell((short) 13).setCellValue("emailResponsavel");
+		row.createCell((short) 14).setCellValue("NomeMae");
+		row.createCell((short) 15).setCellValue("EnderecoMae");
+		row.createCell((short) 16).setCellValue("TelefoneCelularMae");
+		row.createCell((short) 17).setCellValue("TelefoneResidencialMae");
+		row.createCell((short) 18).setCellValue("TelefoneComercialMae");
+		row.createCell((short) 19).setCellValue("emailMae");
 		
-		
-		if(Tutoria != 0 && Periodo == 0 & Ano == 0){
-			grupo = new GrupoService().listarTutor(Tutoria);
-			int qtd = grupo.size();
+		List<AlunoVariavel> list = new AlunoVariavelService().listarRelatorioSecretaria(Tutoria, Ano, Periodo, Neces, Prog, Status);
+		for (AlunoVariavel alunoVariavel : list) {
+			h++;
+			row = firstSheet.createRow(h);
+			//row.createCell((short) 0).setCellValue("Relatório");
 			
-			for(int i = 0; i < qtd; i++){
-				alunos = new AlunoVariavelService().listaGrupo(grupo.get(i).getIdgrupo());
-				if(!alunos.isEmpty()){
-					for(int k =0; k < alunos.size(); k++){
-						h++;
-						row = firstSheet.createRow(h);
-						//row.createCell((short) 0).setCellValue("Relatório");
-						
-						if(Nome != "" && Nome != null){
-							
-							
-							String valor = alunos.get(k).getAluno().getNome();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								row.createCell((short) 0).setCellValue(valor);
-								
-							}else{
-								retorno.add("não informado");
-							}
-						
-						}
-						if(Sexo != "" && Sexo != null){
-							
-							String valor = alunos.get(k).getAluno().getSexo();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								row.createCell((short) 1).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-						}
-						if(Datanascimento  != "" && Datanascimento  != null){
-							
-							Date valor = alunos.get(k).getAluno().getDataNascimento();
-							
-							if(valor != null){
-								
-								DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-								
-								String dataS = formatter.format(valor);
-								
-								//Date data = (Date) formatter.parse(dataS);
-								
-								retorno.add(dataS);
-								
-								row.createCell((short) 2).setCellValue(valor);
-							}else{
-								retorno.add( null);
-							}
-							
-							
-						}
-						if(Endereco != "" && Endereco != null){
-							
-							String valor = alunos.get(k).getAluno().getEndereco();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								row.createCell((short) 3).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(TelefoneResidencial != "" && TelefoneResidencial != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								row.createCell((short) 4).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						}
-						if(TelefoneCelular != "" && TelefoneCelular != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-		
-								row.createCell((short) 5).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						}
-						if(email != "" && email != null){
-							
-							String valor = alunos.get(k).getAluno().getEmail();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
+			if(tut != "" && tut != null){
 				
-								row.createCell((short) 6).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						}
-						if(NomeResponsavel != "" && NomeResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-			
-								row.createCell((short) 7).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 8).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 9).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						
-						}
-						if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
+				String valor = alunoVariavel.getGrupo().getTutoria().getTutoria();
 				
-								row.createCell((short) 10).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								
-								row.createCell((short) 11).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(emailResponsavel != "" && emailResponsavel != null){
-							
-							String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 12).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(NomeMae != "" && NomeMae != null){
-							
-							String valor = alunos.get(k).getAluno().getNomeMae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 13).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(EnderecoMae != "" && EnderecoMae != null){
-							
-							String valor = alunos.get(k).getAluno().getEnderecoMae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 14).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						}
-						if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 15).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						
-						}
-						if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 16).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-							
-						}
-						if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-							
-							String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-								
-								row.createCell((short) 17).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-							
-							
-						}
-						if(emailMae != "" && emailMae != null){
-							
-							String valor = alunos.get(k).getAluno().getEmail1Mae();
-							
-							if(valor != null && valor != "-"){
-								retorno.add(valor);
-							
-								row.createCell((short) 18).setCellValue(valor);
-							}else{
-								retorno.add("não informado");
-							}
-						}
-						
-						listRetorno.add(retorno);
-						
-					}
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 0).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
 				}
 			}
 			
-			
-		}else if(Ano != 0 && Tutoria == 0 && Periodo == 0){
-			
-			alunos = new AlunoVariavelService().listaAnoEstudo(new AnoEstudoService().listarkey(Ano).get(0));
-			if(!alunos.isEmpty()){
-				for(int k =0; k < alunos.size(); k++){
+			if(Nome != "" && Nome != null){
+				
+				
+				String valor = alunoVariavel.getAluno().getNome();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+					row.createCell((short) 1).setCellValue(valor);
 					
-					h++;
-					row = firstSheet.createRow(h);
-					row.createCell((short) 0).setCellValue("Relatório");
-					if(Nome != "" && Nome != null){
-						
-						String valor = alunos.get(k).getAluno().getNome();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-					
-					}
-					if(Sexo != "" && Sexo != null){
-						
-						String valor = alunos.get(k).getAluno().getSexo();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-					}
-					if(Datanascimento  != "" && Datanascimento  != null){
-						
-						Date valor = alunos.get(k).getAluno().getDataNascimento();
-						
-						if(valor != null){
-							
-							DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-							
-							String dataS = formatter.format(valor);
-							
-							//Date data = (Date) formatter.parse(dataS);
-							
-							retorno.add(dataS);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add( null);
-						}
-						
-						
-					}
-					if(Endereco != "" && Endereco != null){
-						
-						String valor = alunos.get(k).getAluno().getEndereco();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencial != "" && TelefoneResidencial != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelular != "" && TelefoneCelular != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(email != "" && email != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(NomeResponsavel != "" && NomeResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					
-					}
-					if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(emailResponsavel != "" && emailResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(NomeMae != "" && NomeMae != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(EnderecoMae != "" && EnderecoMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEnderecoMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}		
-					
-					}
-					if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(emailMae != "" && emailMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Mae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							h++;
-							row = firstSheet.createRow(h);
-							row.createCell((short) 0).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-					}
-					
-					listRetorno.add(retorno);
-					
+				}else{
+					retorno.add("não informado");
 				}
+			
 			}
-			
-		}else if(Periodo != 0 && Ano == 0 && Tutoria == 0){
-			
-			alunos = new AlunoVariavelService().listaPeriodo(new PeriodoService().listarkey(Periodo).get(0));
-			if(!alunos.isEmpty()){
-				for(int k =0; k < alunos.size(); k++){
-					h++;
-					row = firstSheet.createRow(h);
-					//row.createCell((short) 0).setCellValue("Relatório");
+			if(Sexo != "" && Sexo != null){
+				
+				String valor = alunoVariavel.getAluno().getSexo();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+					row.createCell((short) 2).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+			}
+			if(Datanascimento  != "" && Datanascimento  != null){
+				
+				Date valor = alunoVariavel.getAluno().getDataNascimento();
+				
+				if(valor != null){
 					
-					if(Nome != "" && Nome != null){
-						
-						
-						String valor = alunos.get(k).getAluno().getNome();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 0).setCellValue(valor);
-							
-						}else{
-							retorno.add("não informado");
-						}
+					DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
 					
-					}
-					if(Sexo != "" && Sexo != null){
-						
-						String valor = alunos.get(k).getAluno().getSexo();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 1).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-					}
-					if(Datanascimento  != "" && Datanascimento  != null){
-						
-						Date valor = alunos.get(k).getAluno().getDataNascimento();
-						
-						if(valor != null){
-							
-							DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-							
-							String dataS = formatter.format(valor);
-							
-							//Date data = (Date) formatter.parse(dataS);
-							
-							retorno.add(dataS);
-							row.createCell((short) 2).setCellValue(valor);
-						}else{
-							retorno.add( null);
-						}
-						
-						
-					}
-					if(Endereco != "" && Endereco != null){
-						
-						String valor = alunos.get(k).getAluno().getEndereco();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 3).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencial != "" && TelefoneResidencial != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 4).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelular != "" && TelefoneCelular != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
+					String dataS = formatter.format(valor);
+					
+					//Date data = (Date) formatter.parse(dataS);
+					
+					retorno.add(dataS);
+					
+					row.createCell((short) 3).setCellValue(valor);
+				}else{
+					retorno.add( null);
+				}
+				
+				
+			}
+			if(Endereco != "" && Endereco != null){
+				
+				String valor = alunoVariavel.getAluno().getEndereco();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+					row.createCell((short) 4).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(TelefoneResidencial != "" && TelefoneResidencial != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneResidencialResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+					row.createCell((short) 5).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+			}
+			if(TelefoneCelular != "" && TelefoneCelular != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneCelularResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+
+					row.createCell((short) 6).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+			}
+			if(email != "" && email != null){
+				
+				String valor = alunoVariavel.getAluno().getEmail();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
 	
-							row.createCell((short) 5).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(email != "" && email != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-			
-							row.createCell((short) 6).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(NomeResponsavel != "" && NomeResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-		
-							row.createCell((short) 7).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 8).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 9).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					
-					}
-					if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-			
-							row.createCell((short) 10).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							
-							row.createCell((short) 11).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(emailResponsavel != "" && emailResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 12).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(NomeMae != "" && NomeMae != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 13).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(EnderecoMae != "" && EnderecoMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEnderecoMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 14).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 15).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					
-					}
-					if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 16).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							
-							row.createCell((short) 17).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(emailMae != "" && emailMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Mae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 18).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-					}
-					
-					listRetorno.add(retorno);
-					
+					row.createCell((short) 7).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
 				}
-			}
-			
-		}else if(Tutoria != 0 && Ano != 0 && Periodo == 0){
-			
-			grupo = new GrupoService().listarTutor(Tutoria);
-			int qtd = grupo.size();
-			
-			for(int i = 0; i < qtd; i++){
-				alunos = new AlunoVariavelService().listaGrupo(grupo.get(i).getIdgrupo());
-				if(!alunos.isEmpty()){
-					for(int k =0; k < alunos.size(); k++){
-						if(alunos.get(k).getAnoEstudo().getIdanoEstudo() == Ano){
-							h++;
-							row = firstSheet.createRow(h);
-							//row.createCell((short) 0).setCellValue("Relatório");
-							
-							if(Nome != "" && Nome != null){
-								
-								
-								String valor = alunos.get(k).getAluno().getNome();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 0).setCellValue(valor);
-									
-								}else{
-									retorno.add("não informado");
-								}
-							
-							}
-							if(Sexo != "" && Sexo != null){
-								
-								String valor = alunos.get(k).getAluno().getSexo();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 1).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-							}
-							if(Datanascimento  != "" && Datanascimento  != null){
-								
-								Date valor = alunos.get(k).getAluno().getDataNascimento();
-								
-								if(valor != null){
-									
-									DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-									
-									String dataS = formatter.format(valor);
-									
-									//Date data = (Date) formatter.parse(dataS);
-									
-									retorno.add(dataS);
-									row.createCell((short) 2).setCellValue(valor);
-								}else{
-									retorno.add( null);
-								}
-								
-								
-							}
-							if(Endereco != "" && Endereco != null){
-								
-								String valor = alunos.get(k).getAluno().getEndereco();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 3).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencial != "" && TelefoneResidencial != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 4).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelular != "" && TelefoneCelular != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-			
-									row.createCell((short) 5).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(email != "" && email != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-					
-									row.createCell((short) 6).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(NomeResponsavel != "" && NomeResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
 				
-									row.createCell((short) 7).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 8).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 9).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-					
-									row.createCell((short) 10).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 11).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(emailResponsavel != "" && emailResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 12).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(NomeMae != "" && NomeMae != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 13).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(EnderecoMae != "" && EnderecoMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEnderecoMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 14).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 15).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 16).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 17).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(emailMae != "" && emailMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Mae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 18).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-							}
-							
-							listRetorno.add(retorno);
-							
-						}
-				}
-				}
-			}
-			
-		}else if(Tutoria != 0 && Periodo != 0 && Ano == 0){
-			
-			grupo = new GrupoService().listarTutor(Tutoria);
-			int qtd = grupo.size();
-			
-			for(int i = 0; i < qtd; i++){
-				alunos = new AlunoVariavelService().listaGrupo(grupo.get(i).getIdgrupo());
-				if(!alunos.isEmpty()){
-					for(int k =0; k < alunos.size(); k++){
-						if(alunos.get(k).getPeriodo().getIdperiodo() == Periodo){
-							h++;
-							row = firstSheet.createRow(h);
-							//row.createCell((short) 0).setCellValue("Relatório");
-							
-							if(Nome != "" && Nome != null){
-								
-								
-								String valor = alunos.get(k).getAluno().getNome();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 0).setCellValue(valor);
-									
-								}else{
-									retorno.add("não informado");
-								}
-							
-							}
-							if(Sexo != "" && Sexo != null){
-								
-								String valor = alunos.get(k).getAluno().getSexo();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 1).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-							}
-							if(Datanascimento  != "" && Datanascimento  != null){
-								
-								Date valor = alunos.get(k).getAluno().getDataNascimento();
-								
-								if(valor != null){
-									
-									DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-									
-									String dataS = formatter.format(valor);
-									
-									//Date data = (Date) formatter.parse(dataS);
-									
-									retorno.add(dataS);
-									row.createCell((short) 2).setCellValue(valor);
-								}else{
-									retorno.add( null);
-								}
-								
-								
-							}
-							if(Endereco != "" && Endereco != null){
-								
-								String valor = alunos.get(k).getAluno().getEndereco();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 3).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencial != "" && TelefoneResidencial != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 4).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelular != "" && TelefoneCelular != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-			
-									row.createCell((short) 5).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(email != "" && email != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-					
-									row.createCell((short) 6).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(NomeResponsavel != "" && NomeResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
 				
-									row.createCell((short) 7).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 8).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 9).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-					
-									row.createCell((short) 10).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 11).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(emailResponsavel != "" && emailResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 12).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(NomeMae != "" && NomeMae != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 13).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(EnderecoMae != "" && EnderecoMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEnderecoMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 14).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 15).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 16).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 17).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(emailMae != "" && emailMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Mae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 18).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-							}
-							
-							listRetorno.add(retorno);
-							
-						}
-					}
-				}
 			}
+			if(NomeResponsavel != "" && NomeResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getNomeResponsavel();	
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+
+					row.createCell((short) 8).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getParentescoResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 9).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneResidencialResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 10).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
 			
-		}else if(Periodo != 0 && Ano != 0 && Tutoria == 0){
-			alunos = new AlunoVariavelService().listaAnoEstudoPeriodoComgrupo(new AnoEstudoService().listarkey(Ano).get(0), new PeriodoService().listarkey(Periodo).get(0));
-			if(!alunos.isEmpty()){
-				for(int k =0; k < alunos.size(); k++){
-					h++;
-					row = firstSheet.createRow(h);
-					//row.createCell((short) 0).setCellValue("Relatório");
-					
-					if(Nome != "" && Nome != null){
-						
-						
-						String valor = alunos.get(k).getAluno().getNome();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 0).setCellValue(valor);
-							
-						}else{
-							retorno.add("não informado");
-						}
-					
-					}
-					if(Sexo != "" && Sexo != null){
-						
-						String valor = alunos.get(k).getAluno().getSexo();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 1).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-					}
-					if(Datanascimento  != "" && Datanascimento  != null){
-						
-						Date valor = alunos.get(k).getAluno().getDataNascimento();
-						
-						if(valor != null){
-							
-							DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-							
-							String dataS = formatter.format(valor);
-							
-							//Date data = (Date) formatter.parse(dataS);
-							
-							retorno.add(dataS);
-							row.createCell((short) 2).setCellValue(valor);
-						}else{
-							retorno.add( null);
-						}
-						
-						
-					}
-					if(Endereco != "" && Endereco != null){
-						
-						String valor = alunos.get(k).getAluno().getEndereco();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 3).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencial != "" && TelefoneResidencial != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							row.createCell((short) 4).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelular != "" && TelefoneCelular != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
+			}
+			if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneCelularResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
 	
-							row.createCell((short) 5).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(email != "" && email != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-			
-							row.createCell((short) 6).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(NomeResponsavel != "" && NomeResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-		
-							row.createCell((short) 7).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 8).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 9).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					
-					}
-					if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-			
-							row.createCell((short) 10).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							
-							row.createCell((short) 11).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(emailResponsavel != "" && emailResponsavel != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 12).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(NomeMae != "" && NomeMae != null){
-						
-						String valor = alunos.get(k).getAluno().getNomeMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 13).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(EnderecoMae != "" && EnderecoMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEnderecoMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 14).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 15).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					
-					}
-					if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 16).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-						
-					}
-					if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-						
-						String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-							
-							row.createCell((short) 17).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-						
-						
-					}
-					if(emailMae != "" && emailMae != null){
-						
-						String valor = alunos.get(k).getAluno().getEmail1Mae();
-						
-						if(valor != null && valor != "-"){
-							retorno.add(valor);
-						
-							row.createCell((short) 18).setCellValue(valor);
-						}else{
-							retorno.add("não informado");
-						}
-					}
-					
-					listRetorno.add(retorno);
-					
+					row.createCell((short) 11).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
 				}
-			}
-		}else if(Tutoria != 0 && Ano != 0 && Periodo != 0){
-			grupo = new GrupoService().listarTutor(Tutoria);
-			int qtd = grupo.size();
-			
-			for(int i = 0; i < qtd; i++){
-				alunos = new AlunoVariavelService().listaGrupo(grupo.get(i).getIdgrupo());
-				if(!alunos.isEmpty()){
-					for(int k =0; k < alunos.size(); k++){
-						if(alunos.get(k).getAnoEstudo().getIdanoEstudo() == Ano && alunos.get(k).getPeriodo().getIdperiodo() == Periodo){
-							h++;
-							row = firstSheet.createRow(h);
-							//row.createCell((short) 0).setCellValue("Relatório");
-							
-							if(Nome != "" && Nome != null){
-								
-								
-								String valor = alunos.get(k).getAluno().getNome();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 0).setCellValue(valor);
-									
-								}else{
-									retorno.add("não informado");
-								}
-							
-							}
-							if(Sexo != "" && Sexo != null){
-								
-								String valor = alunos.get(k).getAluno().getSexo();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 1).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-							}
-							if(Datanascimento  != "" && Datanascimento  != null){
-								
-								Date valor = alunos.get(k).getAluno().getDataNascimento();
-								
-								if(valor != null){
-									DateFormat formatter = new SimpleDateFormat("dd-MM-yy");
-									
-									String dataS = formatter.format(valor);
-									
-									//Date data = (Date) formatter.parse(dataS);
-									
-									retorno.add(dataS);
-									row.createCell((short) 2).setCellValue(valor);
-								}else{
-									retorno.add( null);
-								}
-								
-								
-							}
-							if(Endereco != "" && Endereco != null){
-								
-								String valor = alunos.get(k).getAluno().getEndereco();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 3).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencial != "" && TelefoneResidencial != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									row.createCell((short) 4).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelular != "" && TelefoneCelular != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-			
-									row.createCell((short) 5).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(email != "" && email != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-					
-									row.createCell((short) 6).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(NomeResponsavel != "" && NomeResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeResponsavel();	
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
 				
-									row.createCell((short) 7).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(ParentescoResponsavel != "" && ParentescoResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getParentescoResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 8).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneResidencialResponsavel != "" && TelefoneResidencialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 9).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneCelularResponsavel != "" && TelefoneCelularResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
+				
+				
+			}
+			if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneComercialResponsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
 					
-									row.createCell((short) 10).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialResponsavel != "" && TelefoneComercialResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialResponsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 11).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(emailResponsavel != "" && emailResponsavel != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Responsavel();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 12).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(NomeMae != "" && NomeMae != null){
-								
-								String valor = alunos.get(k).getAluno().getNomeMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 13).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(EnderecoMae != "" && EnderecoMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEnderecoMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 14).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneCelularMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 15).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							
-							}
-							if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneResidencialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 16).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-								
-							}
-							if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
-								
-								String valor = alunos.get(k).getAluno().getTelefoneComercialMae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-									
-									row.createCell((short) 17).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-								
-								
-							}
-							if(emailMae != "" && emailMae != null){
-								
-								String valor = alunos.get(k).getAluno().getEmail1Mae();
-								
-								if(valor != null && valor != "-"){
-									retorno.add(valor);
-								
-									row.createCell((short) 18).setCellValue(valor);
-								}else{
-									retorno.add("não informado");
-								}
-							}
-							
-							listRetorno.add(retorno);
-							
-						}
-					}
+					row.createCell((short) 12).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(emailResponsavel != "" && emailResponsavel != null){
+				
+				String valor = alunoVariavel.getAluno().getEmail1Responsavel();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 13).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(NomeMae != "" && NomeMae != null){
+				
+				String valor = alunoVariavel.getAluno().getNomeMae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 14).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(EnderecoMae != "" && EnderecoMae != null){
+				
+				String valor = alunoVariavel.getAluno().getEnderecoMae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 15).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+			}
+			if(TelefoneCelularMae != "" && TelefoneCelularMae != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneCelularMae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 16).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+			
+			}
+			if(TelefoneResidencialMae != "" && TelefoneResidencialMae != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneResidencialMae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 17).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+				
+			}
+			if(TelefoneComercialMae != "" && TelefoneComercialMae != null){
+				
+				String valor = alunoVariavel.getAluno().getTelefoneComercialMae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+					
+					row.createCell((short) 18).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
+				}
+				
+				
+			}
+			if(emailMae != "" && emailMae != null){
+				
+				String valor = alunoVariavel.getAluno().getEmail1Mae();
+				
+				if(valor != null && valor != "-"){
+					retorno.add(valor);
+				
+					row.createCell((short) 19).setCellValue(valor);
+				}else{
+					retorno.add("não informado");
 				}
 			}
+			
+			listRetorno.add(retorno);
 		}
+		
 		if(listRetorno.isEmpty()){
 		   retorno.add("não há valores");
 	       listRetorno.add(retorno);
@@ -2645,6 +880,34 @@ public class AlunoVariavelResource {
 		return evento;
 	}
 	
+	@Path("alunoInativo/{id}")
+	@GET
+	@Produces("application/json")
+	public AlunoVariavel getAlunoInativo(@PathParam("id") int id) {
+		logger.info("Lista AlunoVariavel  por id " + id);
+		List<AlunoVariavel> resultado;
+		resultado = new AlunoVariavelService().listaAlunoInativo(id);
+		AlunoVariavel evento = resultado.get(0);
+
+		return evento;
+	}
+	
+	/**
+	 * Lista todos Aluno variavel de um Aluno
+	 * @param id
+	 * @return Obj AlunoVariavel
+	 */
+	@Path("alunoTodos/{id}")
+	@GET
+	@Produces("application/json")
+	public List<AlunoVariavel> getAlunoTodos(@PathParam("id") int id) {
+		logger.info("Lista AlunoVariavel  por id " + id);
+		List<AlunoVariavel> resultado;
+		resultado = new AlunoVariavelService().listaAlunoTodos(id);
+
+		return resultado;
+	}
+	
 	/**
 	 * Lista grupo
 	 * @param id
@@ -2658,6 +921,22 @@ public class AlunoVariavelResource {
 		List<AlunoVariavel> resultado;
 		resultado = new AlunoVariavelService().listaGrupo(id);
 		///AlunoVariavel evento = resultado.get(0);
+
+		return resultado;
+	}
+	
+	/**
+	 * Lista tutoria
+	 * @param id
+	 * @return list
+	 */
+	@Path("tutoria/{id}")
+	@GET
+	@Produces("application/json")
+	public List<AlunoVariavel> getTutoria(@PathParam("id") int id) {
+		logger.info("Lista AlunoVariavel  por tutoria " + id);
+		List<AlunoVariavel> resultado;
+		resultado = new AlunoVariavelService().listaTutoria(id);
 
 		return resultado;
 	}
@@ -2803,6 +1082,7 @@ public class AlunoVariavelResource {
 			objAlunoVariavel.setGrupo(objGrupo);
 			objAlunoVariavel.setProgramaSocial(programaSocial);
 			objAlunoVariavel.setAtivo(ativo);
+			objAlunoVariavel.setVerificarRoteiros(1);
 			
 			
 			
@@ -2907,41 +1187,36 @@ public class AlunoVariavelResource {
 			new AlunoVariavelService().update(alunoVariavel.getIdalunoVariavel(), objGrupo.getIdgrupo());
 		}
 		
-		/*if(rsAluno.size() < arrayAlunos.length){
-			int diferenca =  rsAluno.size();
-			   for(int k = diferenca; k <  arrayAlunos.length; k++){
-				   int id = Integer.parseInt(arrayAlunos[k]);
-				   new AlunoVariavelService().update(id, objGrupo.getIdgrupo());
-			   }
-		}
-		
-		
-		for(int i = 0; i < rsAluno.size(); i++){
-			
-			logger.info("Buscando aluno ..." + arrayAlunos[i] );
-			AlunoVariavel objAlunoVariavel;
-			int id=Integer.parseInt(arrayAlunos[i]);
-			//List<AlunoVariavel> rsAlunoVariavel;
-			
-			objAlunoVariavel= new AlunoVariavelService().getAluno(id); 
-			
-			if (objAlunoVariavel == null ) {
-				
-				logger.info("Não foi possivel completar a operacao buscando aluno ..." + arrayAlunos[i] );
-				
-			}else {
-				
-				if(Integer.parseInt(arrayAlunos[i]) != rsAluno.get(i).getIdalunoVariavel()){
-					
-					rsAluno.get(i).setGrupo(null);
-					new AlunoVariavelService().atualizarAlunoVariavel(rsAluno.get(i));
-					
-					new AlunoVariavelService().update(Integer.parseInt(arrayAlunos[i]), objGrupo.getIdgrupo());
-
-				}
-			}
-		}*/
-
 		return "true";
+	}
+	
+	@Path("listarAtivosAno/{i}")
+	@GET
+	@Produces("application/json")
+	public AlunoVariavel ativosAno(@PathParam("i") int i){
+		AlunoVariavel resultado = new AlunoVariavelService().listarAtivosAno(Calendar.getInstance().get(Calendar.YEAR), i);
+		return resultado;
+	}
+	
+	/** Serviço que atualiza o grupo de determinado aluno variável
+	 * @author Pedro Henrique dos Santos
+	 * @param id Identificador do aluno variável que será atualizado
+	 * @param idGrupo Identificador do novo grupo que o usuário irá informar para aluno variável
+	 * @return id do aluno variável recém manipulado
+	 */
+	@Path("UpdateGrupo")
+	@POST
+	@Produces("text/plain")
+	public String eventoAction(@FormParam("id") int id, @FormParam("idGrupo") int idGrupo){
+		logger.info("Buscando Aluno Variável...");
+		AlunoVariavel alunoVariavel = new AlunoVariavelService().listarkey(id).get(0);
+		if(alunoVariavel.getGrupo().getLider() != null && alunoVariavel.getAluno().getIdAluno() == alunoVariavel.getGrupo().getLider().getIdAluno()){
+			alunoVariavel.getGrupo().setLider(null);
+			new GrupoService().atualizarGrupo(alunoVariavel.getGrupo());
+		}
+		Grupo grupo = new GrupoService().listarkey(idGrupo).get(0);
+		alunoVariavel.setGrupo(grupo);
+		alunoVariavel = new AlunoVariavelService().atualizarAlunoVariavel(alunoVariavel);
+		return Integer.toString(alunoVariavel.getIdalunoVariavel());		
 	}
 }

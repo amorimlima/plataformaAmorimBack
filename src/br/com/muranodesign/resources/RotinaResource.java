@@ -1,6 +1,7 @@
 package br.com.muranodesign.resources;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -12,21 +13,36 @@ import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
 
+import br.com.muranodesign.business.AgendamentoSalaService;
 import br.com.muranodesign.business.AgrupamentoService;
 import br.com.muranodesign.business.AlunoAgrupamentoService;
 import br.com.muranodesign.business.AnoLetivoService;
+import br.com.muranodesign.business.OficinaProfessorService;
 import br.com.muranodesign.business.OficinaService;
 import br.com.muranodesign.business.RotinaService;
 import br.com.muranodesign.business.SemanaService;
-import br.com.muranodesign.model.Agrupamento;
+import br.com.muranodesign.business.TutoriaService;
 import br.com.muranodesign.model.AlunoAgrupamento;
+import br.com.muranodesign.model.OficinaProfessor;
 import br.com.muranodesign.model.Rotina;
+import br.com.muranodesign.model.Tutoria;
 
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Rotina")
 public class RotinaResource {
 	
 	private Logger logger = Logger.getLogger(RotinaResource.class.getName());
 	
+	
+	@Path("Teste")
+	@POST
+	public String teste(@FormParam("json") String ob){
+		return "oi";
+	}
 	
 	/**
 	 * 
@@ -64,30 +80,30 @@ public class RotinaResource {
 			
 			Rotina rotina = new Rotina();
 			
-			List<Rotina> validação = new RotinaService().listarInconsistencia(Hora, idDia/*, idSala*/);
-			
-			List<AlunoAgrupamento> agrupamentoAlunos = new ArrayList<AlunoAgrupamento>();
-			Agrupamento agrupamentoNovo = new AgrupamentoService().listarkey(idAgrupamento).get(0);
-			
-			
-			if(!validação.isEmpty()){
-				for(Rotina rotina2 : validação) {
-					agrupamentoAlunos.addAll(new AlunoAgrupamentoService().listarAgrupamento(rotina2.getAgrupamento().getIdagrupamento()));
-				}
-				
-				List<AlunoAgrupamento> agrupamentoAlunosNovo = new ArrayList<AlunoAgrupamento>();
-				agrupamentoAlunosNovo.addAll(new AlunoAgrupamentoService().listarAgrupamento(agrupamentoNovo.getIdagrupamento()));
-				
-				for(int i = 0; i < agrupamentoAlunos.size();i++){
-					for(int j = 0; j < agrupamentoAlunosNovo.size();j++){
-						//if(agrupamentoAlunos.get(i).getAluno().getIdalunoVariavel() == agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()){
-						if(agrupamentoAlunos.get(i).getAluno().equals(agrupamentoAlunosNovo.get(j).getAluno())){
-							return "Erro: O aluno de id "+agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()+"já tem uma rotina para esse horario";
-						}
-					}
-				}	
-				//return "Erro: Já existe uma rotina para essa data, hora e sala. Favor escolher outra";
-			}else{
+//			List<Rotina> validação = new RotinaService().listarInconsistencia(Hora, idDia/*, idSala*/);
+//			
+//			List<AlunoAgrupamento> agrupamentoAlunos = new ArrayList<AlunoAgrupamento>();
+//			Agrupamento agrupamentoNovo = new AgrupamentoService().listarkey(idAgrupamento).get(0);
+//			
+//			
+//			if(!validação.isEmpty()){
+//				for(Rotina rotina2 : validação) {
+//					agrupamentoAlunos.addAll(new AlunoAgrupamentoService().listarAgrupamento(rotina2.getAgrupamento().getIdagrupamento()));
+//				}
+//				
+//				List<AlunoAgrupamento> agrupamentoAlunosNovo = new ArrayList<AlunoAgrupamento>();
+//				agrupamentoAlunosNovo.addAll(new AlunoAgrupamentoService().listarAgrupamento(agrupamentoNovo.getIdagrupamento()));
+//				
+//				for(int i = 0; i < agrupamentoAlunos.size();i++){
+//					for(int j = 0; j < agrupamentoAlunosNovo.size();j++){
+//						//if(agrupamentoAlunos.get(i).getAluno().getIdalunoVariavel() == agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()){
+//						if(agrupamentoAlunos.get(i).getAluno().equals(agrupamentoAlunosNovo.get(j).getAluno())){
+//							return "Erro: O aluno de id "+agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()+"já tem uma rotina para esse horario";
+//						}
+//					}
+//				}	
+//				//return "Erro: Já existe uma rotina para essa data, hora e sala. Favor escolher outra";
+//			}else{
 			
 				rotina.setHora(Hora);
 				rotina.setDia(new SemanaService().listarkey(idDia).get(0));
@@ -96,36 +112,44 @@ public class RotinaResource {
 				rotina.setAgrupamento(new AgrupamentoService().listarkey(idAgrupamento).get(0));
 				rotina.setAnoLetivo(new AnoLetivoService().listarkey(anoLetivo).get(0));
 				
-				resultado = new RotinaService().criarRotina(rotina);
-			}
+				if (id != 0)
+				{
+					rotina.setIdrotina(id);
+					resultado = new RotinaService().atualizarRotina(rotina);
+				}
+				else
+				{
+					resultado = new RotinaService().criarRotina(rotina);
+				}
+//			}
 			
 		}else if(action.equals("update")){
 			
 			Rotina rotina = new RotinaService().listarkey(id).get(0);
 			
-			List<Rotina> validação = new RotinaService().listarInconsistencia(Hora, idDia/*, idSala*/);
+//			List<Rotina> validação = new RotinaService().listarInconsistencia(Hora, idDia/*, idSala*/);
+//			
+//			List<AlunoAgrupamento> agrupamentoAlunos = new ArrayList<AlunoAgrupamento>();
+//			Agrupamento agrupamentoNovo = new AgrupamentoService().listarkey(idAgrupamento).get(0);
 			
-			List<AlunoAgrupamento> agrupamentoAlunos = new ArrayList<AlunoAgrupamento>();
-			Agrupamento agrupamentoNovo = new AgrupamentoService().listarkey(idAgrupamento).get(0);
 			
-			
-			if(!validação.isEmpty()){
-				for(Rotina rotina2 : validação) {
-					agrupamentoAlunos.addAll(new AlunoAgrupamentoService().listarAgrupamento(rotina2.getAgrupamento().getIdagrupamento()));
-				}
-				
-				List<AlunoAgrupamento> agrupamentoAlunosNovo = new ArrayList<AlunoAgrupamento>();
-				agrupamentoAlunosNovo.addAll(new AlunoAgrupamentoService().listarAgrupamento(agrupamentoNovo.getIdagrupamento()));
-				
-				for(int i = 0; i < agrupamentoAlunos.size();i++){
-					for(int j = 0; j < agrupamentoAlunosNovo.size();j++){
-						if(agrupamentoAlunos.get(i).getAluno().equals(agrupamentoAlunosNovo.get(j).getAluno())){
-							return "Erro: O aluno de id "+agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()+"já tem uma rotina para esse horario";
-						}
-					}
-				}
-						
-			}else{
+//			if(!validação.isEmpty()){
+//				for(Rotina rotina2 : validação) {
+//					agrupamentoAlunos.addAll(new AlunoAgrupamentoService().listarAgrupamento(rotina2.getAgrupamento().getIdagrupamento()));
+//				}
+//				
+//				List<AlunoAgrupamento> agrupamentoAlunosNovo = new ArrayList<AlunoAgrupamento>();
+//				agrupamentoAlunosNovo.addAll(new AlunoAgrupamentoService().listarAgrupamento(agrupamentoNovo.getIdagrupamento()));
+//				
+//				for(int i = 0; i < agrupamentoAlunos.size();i++){
+//					for(int j = 0; j < agrupamentoAlunosNovo.size();j++){
+//						if(agrupamentoAlunos.get(i).getAluno().equals(agrupamentoAlunosNovo.get(j).getAluno())){
+//							return "Erro: O aluno de id "+agrupamentoAlunosNovo.get(j).getAluno().getIdalunoVariavel()+"já tem uma rotina para esse horario";
+//						}
+//					}
+//				}
+//						
+//			}else{
 			
 				rotina.setHora(Hora);
 				rotina.setDia(new SemanaService().listarkey(idDia).get(0));
@@ -134,7 +158,7 @@ public class RotinaResource {
 				rotina.setAnoLetivo(new AnoLetivoService().listarkey(anoLetivo).get(0));
 				
 				resultado = new RotinaService().atualizarRotina(rotina);
-			}
+//			}
 		}
 		
 		return Integer.toString(resultado.getIdrotina());
@@ -182,4 +206,90 @@ public class RotinaResource {
 	public List<Rotina> getListaPorId(@PathParam("idRotina") int idRotina){
 		return new RotinaService().listarkey(idRotina);
 	}
+	
+	@Path("RotinaDiariaAluno/{idaluno}/{iddiaSemana}")
+	@GET
+	@Produces("application/json")
+	public List<Object> getRotinaDiariaAluno(@PathParam("idaluno") int idaluno, @PathParam("iddiaSemana") int iddiaSemana){
+		List<Object> resultado = new ArrayList<Object>();
+		
+		List<AlunoAgrupamento> alunoAgrupamentos = new AlunoAgrupamentoService().listarAluno(idaluno);
+		for (AlunoAgrupamento alunoAgrupamento : alunoAgrupamentos) {
+			
+			List<Rotina> rotinaAluno = new RotinaService().listarRotinaAlunoDia(alunoAgrupamento.getAgrupamento().getIdagrupamento(), iddiaSemana);
+			for (Rotina rotina : rotinaAluno) {
+				
+				Hashtable<String, Object> rotinaObj = new Hashtable<String, Object>();
+				
+				rotinaObj.put("hora", rotina.getHora());
+				rotinaObj.put("oficina", rotina.getOficina());
+				if (rotina.getOficina() == null)
+				{
+					rotinaObj.put("tutoria", rotina.getTutoria());
+					rotinaObj.put("professor", rotina.getTutoria().getTutor().getNome());
+					rotinaObj.put("sala", new AgendamentoSalaService().listarRotina(rotina.getIdrotina()));
+				}
+				else
+				{
+					rotinaObj.put("professor", new OficinaProfessorService().listarPorOficina(rotina.getOficina().getIdoficina()).get(0).getProfessor().getNome());
+					rotinaObj.put("sala", new AgendamentoSalaService().listarRotina(rotina.getIdrotina()));
+				}
+				
+				resultado.add(rotinaObj);
+			}
+		}		
+		
+		return resultado;
+	}
+	
+	@Path("RotinaDiariaProfessor/{idProfessor}/{idDiaSemana}")
+	@GET
+	@Produces("application/json")
+	public List<Object> getRotinaDiariaProfessor(@PathParam("idProfessor") int idProfessor, @PathParam("idDiaSemana") int idDiaSemana){
+		List<Object> resultado = new ArrayList<Object>();
+		
+		List<OficinaProfessor> oficinasProfessor = new OficinaProfessorService().listarProfessor(idProfessor);
+		for (OficinaProfessor oficinaProfessor : oficinasProfessor) {
+			List<Rotina> rotinaProfessor = new RotinaService().ListarRotinaOficinaDia(oficinaProfessor.getOficina().getIdoficina(), idDiaSemana);
+			for (Rotina rotina : rotinaProfessor) {
+				
+				Hashtable<String, Object> rotinaObj = new Hashtable<String, Object>();
+				
+				rotinaObj.put("hora", rotina.getHora());
+				rotinaObj.put("oficina", rotina.getOficina());
+				rotinaObj.put("tutoria", "");
+				rotinaObj.put("agrupamento", rotina.getAgrupamento().getNome());
+				rotinaObj.put("sala", new AgendamentoSalaService().listarRotina(rotina.getIdrotina()));
+				
+				resultado.add(rotinaObj);
+			}
+		}
+		
+		List<Tutoria> tutoriaProfessor = new TutoriaService().listarProfessorId(idProfessor);
+		for (Tutoria tutoria : tutoriaProfessor) {
+			List<Rotina> rotinaProfessor = new RotinaService().ListarRotinaTutoriaDia(tutoria.getIdtutoria(), idDiaSemana);
+			for (Rotina rotina : rotinaProfessor) {
+				
+				Hashtable<String, Object> rotinaObj = new Hashtable<String, Object>();
+				
+				rotinaObj.put("hora", rotina.getHora());
+				rotinaObj.put("oficina", "");
+				rotinaObj.put("tutoria", tutoria.getIdtutoria());
+				rotinaObj.put("agrupamento", "tutoria");
+				rotinaObj.put("sala", new AgendamentoSalaService().listarRotina(rotina.getIdrotina()));
+				
+				resultado.add(rotinaObj);
+			}
+		}
+		
+		return resultado;
+	}
+	
+	@Path("ListarOficina/{idOficina}")
+	@GET
+	@Produces("application/json")
+	public List<Rotina> listarOficina(@PathParam("idOficina") int idOficina){
+		return new RotinaService().listarPorOficina(idOficina);
+	}
+	
 }

@@ -12,6 +12,7 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -181,8 +182,19 @@ public class ObjetivoDAOImpl extends AbstractHibernateDAO implements ObjetivoDAO
 		List<Objetivo> result = criteria.list();
 		return result;
 	}
-	
 
+	@Override
+	public float countObjetivosAnoProfessor(int idprofessorFuncionario) {
+		Query query = getSession().getNamedQuery("countObjetivosAnoTutoria");
+		query.setString("idTutoria", Integer.toString(idprofessorFuncionario));
+		return (float)query.list().size();
+	}
+	
+	public float countObjetivosAtribuicaoTutoria(int idTutoria) {
+		Query query = getSession().getNamedQuery("countObjetivosAtribuicaoTutoria");
+		query.setString("idTutoria", Integer.toString(idTutoria));
+		return (float)query.list().size();
+	}
 
 
 }

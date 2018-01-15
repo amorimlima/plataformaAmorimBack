@@ -16,7 +16,11 @@ import br.com.muranodesign.business.AlunoAgrupamentoService;
 import br.com.muranodesign.business.AlunoVariavelService;
 import br.com.muranodesign.model.AlunoAgrupamento;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("AlunoAgrupamento")
 public class AlunoAgrupamentoResource {
 	
@@ -35,7 +39,6 @@ public class AlunoAgrupamentoResource {
 	public String eventoAction(
 			@FormParam("action") String action,
 			@FormParam("id") int id,
-			//@FormParam("Alunos") String Alunos,
 			@FormParam("Aluno") int Aluno,
 			@FormParam("idAgrupamento") int idAgrupamento){
 		
@@ -43,7 +46,10 @@ public class AlunoAgrupamentoResource {
 		
 		
 		if(action.equals("delete")){
-			resultado = new AlunoAgrupamentoService().deletarAlunoAgrupamento(new AlunoAgrupamentoService().listarkey(id).get(0));
+			if (id != 0)
+				resultado = new AlunoAgrupamentoService().deletarAlunoAgrupamento(new AlunoAgrupamentoService().listarkey(id).get(0));
+			else
+				resultado = new AlunoAgrupamentoService().deletarAlunoAgrupamento(new AlunoAgrupamentoService().listarAlunoAgrupamento(Aluno, idAgrupamento).get(0));
 		}
 		else if(action.equals("create")){
 			AlunoAgrupamento agrupamento = new AlunoAgrupamento();
@@ -118,6 +124,17 @@ public class AlunoAgrupamentoResource {
 		logger.debug("Listar AlunoAgrupamento ...");
 		List<AlunoAgrupamento> resultado;
 		resultado = new AlunoAgrupamentoService().listarTodos();
+		logger.debug("QTD AlunoAgrupamento : " +resultado.size());
+		return resultado;
+	}
+	
+	@Path("AgrupamentosAlunoLike/{nome}")
+	@GET
+	@Produces("application/json")
+	public List<AlunoAgrupamento> getAlunoAgrupamentoLike(@PathParam("nome") String nome){
+		logger.debug("Listar AlunoAgrupamento ...");
+		List<AlunoAgrupamento> resultado;
+		resultado = new AlunoAgrupamentoService().listarLikeAluno(nome);
 		logger.debug("QTD AlunoAgrupamento : " +resultado.size());
 		return resultado;
 	}

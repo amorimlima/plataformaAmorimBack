@@ -3,6 +3,7 @@ package br.com.muranodesign.dao.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.MuralAlunoDAO;
@@ -53,6 +54,8 @@ public class MuralAlunoDAOImpl extends AbstractHibernateDAO implements MuralAlun
 		Criteria criteria = getSession().createCriteria(MuralAluno.class);
 		criteria.createAlias("alunoVariavel", "alunoVariavel");
 		criteria.add(Restrictions.eq("alunoVariavel.idalunoVariavel", idaluno));
+		criteria.createAlias("mural", "mural");
+		criteria.addOrder(Order.desc("mural.data"));
 		List<MuralAluno> resultado = criteria.list();
 		return resultado;
 	}
@@ -62,6 +65,7 @@ public class MuralAlunoDAOImpl extends AbstractHibernateDAO implements MuralAlun
 		Criteria criteria = getSession().createCriteria(MuralAluno.class);
 		criteria.createAlias("mural", "mural");
 		criteria.add(Restrictions.eq("mural.Idmural", id));
+		criteria.addOrder(Order.desc("mural.data"));
 		List<MuralAluno> resultado = criteria.list();
 		return resultado;
 	}

@@ -8,13 +8,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @Table(name = "oficina")
 @XmlRootElement
+@NamedNativeQueries({
+	@NamedNativeQuery (name="oficina.deletarOficinaSemProfessores", query="DELETE FROM oficina WHERE Idoficina NOT IN (SELECT oficina_Idoficina FROM oficina_professor)")
+})
 public class Oficina implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -28,16 +34,24 @@ public class Oficina implements Serializable{
 	 @Column(name = "nome")
 	 private String nome;
 	 
-	 @OneToOne
-	 private Cores cor;
+	 /*@ManyToOne
+	 @JoinColumn (name = "cor", referencedColumnName = "Idcor")
+	 private Cores cor;*/
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn (name = "tipoOficina", referencedColumnName = "idTipoOficina")
+	 private TipoOficina tipoOficina;
+	
+	@ManyToOne
+	 @JoinColumn (name = "anoLetivo", referencedColumnName = "idano_letivo")
 	 private AnoLetivo anoLetivo;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn (name = "ciclo", referencedColumnName = "Idciclos")
 	 private Ciclos ciclo;
 	 
-	 @OneToOne
+	 @ManyToOne
+	 @JoinColumn (name = "periodo", referencedColumnName = "idperiodo")
 	 private Periodo periodo;
 	 
 
@@ -57,13 +71,13 @@ public class Oficina implements Serializable{
 		this.nome = nome;
 	 }
 
-	public Cores getCor() {
+	/*public Cores getCor() {
 		return cor;
 	}
 
 	public void setCor(Cores cor) {
 		this.cor = cor;
-	}
+	}*/
 
 	public AnoLetivo getAnoLetivo() {
 		return anoLetivo;
@@ -93,5 +107,14 @@ public class Oficina implements Serializable{
 	public void setCiclo(Ciclos ciclo) {
 		this.ciclo = ciclo;
 	}
+	
+	public TipoOficina getTipoOficina() {
+		return tipoOficina;
+	}
+
+	public void setTipoOficina(TipoOficina tipoOficina) {
+		this.tipoOficina = tipoOficina;
+	}
+
 	 
 }

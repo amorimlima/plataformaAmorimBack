@@ -9,6 +9,7 @@
  */
 package br.com.muranodesign.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import br.com.muranodesign.model.RelatorioTutoria;
@@ -63,6 +64,12 @@ public interface RelatorioTutoriaDAO {
 		 * @return
 		 */
 		public List<RelatorioTutoria> listarTutoriaAluno(int tutoria, int aluno);
+
+		public List<RelatorioTutoria> listarTutoriaAlunoAno(int tutoria,
+				int aluno, int ano);
+
+		public List<RelatorioTutoria> getRelatorioData(Date inicio, Date fim,
+				int idAluno);
 	
 
 }

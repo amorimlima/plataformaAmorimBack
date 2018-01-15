@@ -1,5 +1,6 @@
 package br.com.muranodesign.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import br.com.muranodesign.model.PlanejamentoAula;
@@ -48,19 +49,17 @@ public interface PlanejamentoAulaDAO {
 	 * @return
 	 */
 	public List<PlanejamentoAula> listarProfessor(int id);
-	
+
 	/**
-	 * Listar por plano aula
-	 * @param id
+	 * Listar por id de professor e oficina
+	 * @param idProfessor
+	 * @param idOficina
 	 * @return
 	 */
-	public List<PlanejamentoAula> listarPlanoAula(int id);
+	public List<PlanejamentoAula> listarProfessorOficina(int idProfessor,
+			int idOficina);
+
+	public List<PlanejamentoAula> listarIntervalo(Date inicio, Date fim,
+			int idProfessor);
 	
-	/**
-	 * Listar por professor e objetivo aula
-	 * @param idProdessor
-	 * @param idObjetivoAula
-	 * @return
-	 */
-	public List<PlanejamentoAula> listarProfessorObjetivoAula(int idProfessor, int idObjetivoAula, int idplanoAula);
 }

@@ -10,6 +10,7 @@
 package br.com.muranodesign.resources;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -84,8 +85,8 @@ public class TutoriaResource {
 	@GET
 	@Produces("application/json")
 	public List<Hashtable<String, String>> getListarDadosPertinentes(){
-		List<Tutoria> tutores = new TutoriaService().listarTodos();
-		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		List<Tutoria> tutores = new TutoriaService().listarAno(ano);		
 		List<Hashtable<String, String>> list = new ArrayList<Hashtable<String, String>>();
 		
 		for (Tutoria tutoria : tutores) {
@@ -313,12 +314,25 @@ public class TutoriaResource {
 			if (nomeAlunos.length() > 0)
 				list.add(objeto);
 			else
-				new GrupoService().deletarGrupo(grupo);
+			{
+				grupo.setStatus("1");
+				new GrupoService().atualizarGrupo(grupo);
+			}
 		}
 		
 		return list;
 		
 	}
 	
+	@GET	
+	@Path("ListarTodas/")
+	@Produces("application/json")
+	public List<Tutoria> listarTodas(){
+		logger.info("Listar Tutoria ...");
+		List<Tutoria> resultado;
+		resultado = new TutoriaService().listarTodasAnos();
+		logger.info("QTD Tutoria : " + resultado.size());
+		return resultado;
+	}
 
 }

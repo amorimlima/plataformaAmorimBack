@@ -11,6 +11,8 @@ package br.com.muranodesign.resources;
 
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -24,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
+import br.com.muranodesign.business.AlunoVariavelService;
 import br.com.muranodesign.business.CalendarioService;
 import br.com.muranodesign.business.TipoEventoService;
 import br.com.muranodesign.model.Calendario;
@@ -62,6 +65,75 @@ public class CalendarioResource {
 		resultado = new CalendarioService().listarTodos();
 		logger.info("QTD Calendario : " + resultado.size());
 		return resultado;
+	}
+	
+	@Path("CountDiasLetivosAluno/{idAluno}")
+	@GET
+	@Produces("text/plain")
+	public String countdDiasLetivos(@PathParam("idAluno") int idAluno){
+		
+		StringUtil stringUtil = new StringUtil();
+		
+		Date inicio = new AlunoVariavelService().listaAluno(idAluno).get(0).getInicio();
+		Date fim = stringUtil.converteStringData(Calendar.getInstance().get(Calendar.YEAR) + "-12-31");
+		
+		Calendar dataInicio = Calendar.getInstance();
+		dataInicio.setTime(inicio);
+		Calendar dataFim = Calendar.getInstance();
+		dataFim.setTime(fim);
+		if (dataInicio.get(Calendar.YEAR) < dataFim.get(Calendar.YEAR)){
+			inicio = stringUtil.converteStringData(Calendar.getInstance().get(Calendar.YEAR) + "-01-01");
+			dataInicio.setTime(inicio);
+		}
+		return Integer.toString(new CalendarioService().diasLetivosCount(dataInicio, dataFim));
+
+	}
+	
+	@Path("CountDiasLetivosAlunoIntervalo/{dataInicio}/{dataFim}/{idAluno}")
+	@GET
+	@Produces("text/plain")
+	public String countdDiasLetivos(
+			@PathParam("idAluno") int idAluno, 
+			@PathParam("dataInicio") String dataInicio, 
+			@PathParam("dataFim") String dataFim){
+		
+		StringUtil stringUtil = new StringUtil();
+		
+		Date inicioAluno = new AlunoVariavelService().listaAluno(idAluno).get(0).getInicio();
+		Date inicio = stringUtil.converteStringData(dataInicio);
+		Date fim = stringUtil.converteStringData(dataFim);
+		
+		Calendar calendarInicio = Calendar.getInstance();
+		calendarInicio.setTime(inicio);
+		Calendar calendarInicioAluno = Calendar.getInstance();
+		calendarInicioAluno.setTime(inicioAluno);
+		Calendar calendarFim = Calendar.getInstance();
+		calendarFim.setTime(fim);
+		if (calendarInicioAluno.getTime().getTime() < calendarInicio.getTime().getTime()){
+			calendarInicio = calendarInicioAluno;
+		}
+		return Integer.toString(new CalendarioService().diasLetivosCount(calendarInicio, calendarFim));
+
+	}
+	
+	@Path("CountDiasLetivosIntervalo/{dataInicio}/{dataFim}/")
+	@GET
+	@Produces("text/plain")
+	public String countdDiasLetivos(
+			@PathParam("dataInicio") String dataInicio, 
+			@PathParam("dataFim") String dataFim){
+		
+		StringUtil stringUtil = new StringUtil();
+		
+		Date inicio = stringUtil.converteStringData(dataInicio);
+		Date fim = stringUtil.converteStringData(dataFim);
+		
+		Calendar calendarInicio = Calendar.getInstance();
+		calendarInicio.setTime(inicio);
+		Calendar calendarFim = Calendar.getInstance();
+		calendarFim.setTime(fim);
+		return Integer.toString(new CalendarioService().diasLetivosCount(calendarInicio, calendarFim));
+
 	}
 	
 	@Path("Range")
@@ -141,6 +213,26 @@ public class CalendarioResource {
 		return resultado;
 
 	}
+	
+	/**
+	 * Listar calendarios por id de evento
+	 * @param id
+	 * @return list
+	 * @throws ParseException
+	 */
+	@Path("Mes/{mes}/{ano}")
+	@GET
+	@Produces("application/json")
+	public List<Calendario> getByEvento(@PathParam("mes") int mes, @PathParam("ano") int ano) throws ParseException {
+
+		logger.info("Lista Calendario  por ano e mês " + mes + "/" + ano);
+		List<Calendario> resultado;
+		resultado = new CalendarioService().listarGeralMes(mes, ano);
+		
+		return resultado;
+
+	}
+	
 	/**
 	 * Gets the evento.
 	 *

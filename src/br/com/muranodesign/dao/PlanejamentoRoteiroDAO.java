@@ -139,6 +139,21 @@ public interface PlanejamentoRoteiroDAO {
 		 * @return
 		 */
 		public List<PlanejamentoRoteiro> listarObjetivoTotal(int obj);
+
+		public List<PlanejamentoRoteiro> listarAlunoCompletosLista(int idAluno);
+
+		public List<PlanejamentoRoteiro> listarAlunoCorrigidosLista(int idAluno);
+
+		public List<PlanejamentoRoteiro> listarAlunoAno(int idAluno, int ano);
+
+		public List<PlanejamentoRoteiro> countRoteiroCompletos(Integer idroteiro, int idAluno, int ano);
+
+		public List<PlanejamentoRoteiro> countRoteiroCorrigidos(
+				Integer idroteiro, int idAluno, int ano);
+
+		public float countCompletosTutoria(int idTutoria);
+
+		public float countCorrigidosTutoria(int idTutoria);
 	
 	
 }

@@ -11,7 +11,6 @@ package br.com.muranodesign.resources;
 
 import java.util.List;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -173,7 +172,7 @@ public class RoteiroResource {
 	 * @return
 	 */
 	@Path("InativarRoteiro/{id}")
-	@DELETE
+	@GET
 	@Produces("text/plain")
 	public String deletarRoteiro(@PathParam("id") int id){
 		List<Objetivo> objs = new ObjetivoService().listarRoteiro(id);

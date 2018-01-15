@@ -52,15 +52,21 @@ public class RelatorioAluno implements Serializable {
     @Column(name = "data")
     @Temporal(TemporalType.DATE)
     private Date data;
-    @JoinColumn(name = "aluno", referencedColumnName = "ID_ALUNO")
+    @JoinColumn(name = "aluno_variavel", referencedColumnName = "idaluno_variavel")
     @ManyToOne
-    private Aluno aluno;
+    private AlunoVariavel alunoVariavel;
     @JoinColumn(name = "ano_letivo", referencedColumnName = "idano_letivo")
     @ManyToOne
     private AnoLetivo anoLetivo;
     @JoinColumn(name = "professor", referencedColumnName = "idprofessor_funcionario")
     @ManyToOne
     private ProfessorFuncionario professor;
+    @JoinColumn(name = "oficina", referencedColumnName = "Idoficina")
+    @ManyToOne
+    private Oficina oficina;
+    @JoinColumn(name = "agrupamento", referencedColumnName = "Idagrupamento")
+    @ManyToOne
+    private Agrupamento agrupamento;
 
     public RelatorioAluno() {
     }
@@ -93,19 +99,43 @@ public class RelatorioAluno implements Serializable {
         this.data = data;
     }
 
-    public Aluno getAluno() {
-        return aluno;
-    }
-
-    public void setAluno(Aluno aluno) {
-        this.aluno = aluno;
-    }
+//    public Aluno getAluno() {
+//        return aluno;
+//    }
+//
+//    public void setAluno(Aluno aluno) {
+//        this.aluno = aluno;
+//    }
 
     public AnoLetivo getAnoLetivo() {
         return anoLetivo;
     }
 
-    public void setAnoLetivo(AnoLetivo anoLetivo) {
+    public AlunoVariavel getAlunoVariavel() {
+		return alunoVariavel;
+	}
+
+	public void setAlunoVariavel(AlunoVariavel alunoVariavel) {
+		this.alunoVariavel = alunoVariavel;
+	}
+
+	public Oficina getOficina() {
+		return oficina;
+	}
+
+	public void setOficina(Oficina oficina) {
+		this.oficina = oficina;
+	}
+
+	public Agrupamento getAgrupamento() {
+		return agrupamento;
+	}
+
+	public void setAgrupamento(Agrupamento agrupamento) {
+		this.agrupamento = agrupamento;
+	}
+
+	public void setAnoLetivo(AnoLetivo anoLetivo) {
         this.anoLetivo = anoLetivo;
     }
 

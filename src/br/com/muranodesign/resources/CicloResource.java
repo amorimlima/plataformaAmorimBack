@@ -11,7 +11,11 @@ import org.apache.log4j.Logger;
 import br.com.muranodesign.business.CiclosService;
 import br.com.muranodesign.model.Ciclos;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Ciclo")
 public class CicloResource {
 

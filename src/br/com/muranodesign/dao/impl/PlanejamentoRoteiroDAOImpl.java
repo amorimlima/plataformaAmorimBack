@@ -9,9 +9,11 @@
  */
 
 package br.com.muranodesign.dao.impl;
+import java.util.Calendar;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -101,6 +103,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	 */
 	public long listarAlunoTotal(int id){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", id));
 		criteria.add(Restrictions.isNotNull("objetivo"));
 		criteria.setProjection(Projections.count("idAluno"));
@@ -115,6 +120,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	 */
 	public /*List<PlanejamentoRoteiro>*/long listarAlunoCompletos(int id){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", id));
 		criteria.add(Restrictions.isNotNull("objetivo"));
 		criteria.add(Restrictions.eq("status", "2"));
@@ -130,6 +138,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	 */
 	public /*List<PlanejamentoRoteiro>*/long listarAlunoCorrigidos(int id){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", id));
 		criteria.add(Restrictions.isNotNull("objetivo"));
 		criteria.add(Restrictions.eq("status", "3"));
@@ -145,8 +156,27 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarIdAluno(int id){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", id));
 		criteria.add(Restrictions.isNotNull("objetivo"));
+		List<PlanejamentoRoteiro> result = criteria.list();
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PlanejamentoRoteiro> listarAlunoAno(int idAluno, int ano){
+		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar calInicio = Calendar.getInstance();
+		calInicio.set(Calendar.YEAR, ano);
+		calInicio.set(Calendar.DAY_OF_YEAR, 1);
+		Calendar calFim = Calendar.getInstance();
+		calFim.set(Calendar.YEAR, ano);
+		calFim.set(Calendar.DAY_OF_YEAR, calFim.getActualMaximum(Calendar.DAY_OF_YEAR));
+		criteria.add(Restrictions.eq("idAluno", idAluno));
+		criteria.add(Restrictions.ge("dataStatusPlanejado", calInicio.getTime()));
+		criteria.add(Restrictions.le("dataStatusPlanejado", calFim.getTime()));
 		List<PlanejamentoRoteiro> result = criteria.list();
 		return result;
 	}
@@ -158,6 +188,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarStatus(int id){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", id));
 		criteria.add(Restrictions.eq("status", "1"));
 		List<PlanejamentoRoteiro> result = criteria.list();
@@ -171,6 +204,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarPendente(int aluno, int objetivo){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("idAluno", aluno));
 		criteria.createAlias("objetivo", "objetivo");
 		criteria.add(Restrictions.eq("objetivo.idobjetivo",objetivo));
@@ -216,6 +252,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarObjetivoPendente(int obj){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("status", "2"));
 		criteria.createAlias("objetivo", "objetivo");
 		criteria.add(Restrictions.eq("objetivo.idobjetivo",obj));
@@ -231,6 +270,9 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarObjetivoCompleto(int obj){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.add(Restrictions.eq("status", "3"));
 		criteria.createAlias("objetivo", "objetivo");
 		criteria.add(Restrictions.eq("objetivo.idobjetivo",obj));
@@ -245,12 +287,94 @@ public class PlanejamentoRoteiroDAOImpl extends AbstractHibernateDAO implements 
 	@SuppressWarnings("unchecked")
 	public List<PlanejamentoRoteiro> listarObjetivoTotal(int obj){
 		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
 		criteria.createAlias("objetivo", "objetivo");
 		criteria.add(Restrictions.eq("objetivo.idobjetivo",obj));
 		List<PlanejamentoRoteiro> result = criteria.list();
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<PlanejamentoRoteiro> listarAlunoCompletosLista(int idAluno) {
+		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
+		criteria.add(Restrictions.eq("idAluno", idAluno));
+		criteria.add(Restrictions.isNotNull("objetivo"));
+		criteria.add(Restrictions.eq("status", "2"));
+		List<PlanejamentoRoteiro> result = criteria.list();
+		return result;
+	}
 
+	@SuppressWarnings("unchecked")
+	public List<PlanejamentoRoteiro> listarAlunoCorrigidosLista(int idAluno) {
+		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
+		criteria.add(Restrictions.eq("idAluno", idAluno));
+		criteria.add(Restrictions.isNotNull("objetivo"));
+		criteria.add(Restrictions.eq("status", "3"));
+		List<PlanejamentoRoteiro> result = criteria.list();
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<PlanejamentoRoteiro> countRoteiroCompletos(Integer idroteiro, int idAluno, int ano) {
+		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, ano);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		Calendar calFim = Calendar.getInstance();
+		calFim.set(Calendar.YEAR, ano + 1);
+		calFim.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
+		criteria.add(Restrictions.lt("dataStatusPlanejado", calFim.getTime()));
+		criteria.add(Restrictions.eq("idAluno", idAluno));
+		criteria.createAlias("objetivo", "objetivo");
+		criteria.createAlias("objetivo.roteiro", "roteiro");
+		criteria.add(Restrictions.isNotNull("objetivo"));
+		criteria.add(Restrictions.eq("roteiro.idroteiro", idroteiro));
+		criteria.add(Restrictions.ge("status", "2"));
+		List<PlanejamentoRoteiro> result = criteria.list();
+		return result;
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public List<PlanejamentoRoteiro> countRoteiroCorrigidos(Integer idroteiro, int idAluno, int ano) {
+		Criteria criteria = getSession().createCriteria(PlanejamentoRoteiro.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, ano);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		Calendar calFim = Calendar.getInstance();
+		calFim.set(Calendar.YEAR, ano + 1);
+		calFim.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("dataStatusPlanejado", cal.getTime()));
+		criteria.add(Restrictions.lt("dataStatusPlanejado", calFim.getTime()));
+		criteria.add(Restrictions.eq("idAluno", idAluno));
+		criteria.createAlias("objetivo", "objetivo");
+		criteria.createAlias("objetivo.roteiro", "roteiro");
+		criteria.add(Restrictions.isNotNull("objetivo"));
+		criteria.add(Restrictions.eq("roteiro.idroteiro", idroteiro));
+		criteria.add(Restrictions.eq("status", "3"));
+		List<PlanejamentoRoteiro> result = criteria.list();
+		return result;
+	}
+
+	public float countCompletosTutoria(int idTutoria) {
+		Query query = getSession().getNamedQuery("countCompletosTutoria");
+		query.setString("idTutoria", Integer.toString(idTutoria));
+		return (float)query.list().size();
+	}
+
+	public float countCorrigidosTutoria(int idTutoria) {
+		Query query = getSession().getNamedQuery("countCorrigidosTutoria");
+		query.setString("idTutoria", Integer.toString(idTutoria));
+		return (float)query.list().size();
+	}
 
 }

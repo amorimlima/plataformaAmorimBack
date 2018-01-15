@@ -10,6 +10,7 @@
 package br.com.muranodesign.business;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -166,6 +167,72 @@ public class CalendarioService {
 		CalendarioDAO dao = DAOFactory.getCalendarioDAO(pc);
 		List<Calendario> result = dao.listarRange();
 				
+		pc.commitAndClose();
+		return result;
+	}
+
+
+	public List<Calendario> listarGeralMes(int mes, int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		CalendarioDAO dao = DAOFactory.getCalendarioDAO(pc);
+		List<Calendario> result = dao.listarGeralMes(mes, ano);
+		pc.commitAndClose();
+		return result;
+	}
+	
+	public List<Calendario> listaFeriado(Calendar dataInicio, Calendar dataFim){
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		CalendarioDAO dao = DAOFactory.getCalendarioDAO(pc);
+		List<Calendario> result = dao.listFeriados(dataInicio, dataFim);
+		pc.commitAndClose();
+		return result;
+	}
+	
+	public int diasLetivosCount(Calendar dataInicio, Calendar dataFim){
+		int finsDeSemana = 0;
+		Calendar d = Calendar.getInstance();
+		d.set(Calendar.MONTH, dataInicio.get(Calendar.MONTH));
+		d.set(Calendar.DATE, dataInicio.get(Calendar.DATE));
+		for (; d.get(Calendar.DAY_OF_YEAR) <= dataFim.get(Calendar.DAY_OF_YEAR); d.set(Calendar.DATE, d.get(Calendar.DATE) + 1)){
+			if(d.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || d.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+				finsDeSemana++;
+			if (d.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR))
+				break;
+		}
+		int diasFeriado = 0;
+		List<Calendario> feriados = new CalendarioService().listaFeriado(dataInicio, dataFim);
+		for (Calendario calendario : feriados) {
+			Calendar inicioFeriado = Calendar.getInstance();
+			inicioFeriado.setTime(calendario.getDataInicio());
+			Calendar fimFeriado = Calendar.getInstance();
+			if (calendario.getDataFim() != null)
+				fimFeriado.setTime(calendario.getDataFim());
+			else
+				fimFeriado.setTime(calendario.getDataInicio());
+			
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.MONTH, inicioFeriado.get(Calendar.MONTH));
+			c.set(Calendar.DATE, inicioFeriado.get(Calendar.DATE));
+			int fimDeSemanaFeriado = 0;
+			for (; c.get(Calendar.DAY_OF_YEAR) <= fimFeriado.get(Calendar.DAY_OF_YEAR); c.set(Calendar.DATE, c.get(Calendar.DATE) + 1)){
+				if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+					fimDeSemanaFeriado++;
+				if(c.get(Calendar.DAY_OF_YEAR) == Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR))
+					break;
+			}
+			diasFeriado += (fimFeriado.get(Calendar.DAY_OF_YEAR) - inicioFeriado.get(Calendar.DAY_OF_YEAR) + 1) - fimDeSemanaFeriado;
+		}
+		int diasTotais = dataFim.get(Calendar.DAY_OF_YEAR) - dataInicio.get(Calendar.DAY_OF_YEAR) + 1;
+		
+		int diasLetivosTotais = diasTotais - finsDeSemana - diasFeriado;
+		return diasLetivosTotais;
+	}
+
+
+	public List<Calendario> listarFeriadosSemana(int dia, int mes) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		CalendarioDAO dao = DAOFactory.getCalendarioDAO(pc);
+		List<Calendario> result = dao.listarFeriadosSemana(dia, mes);
 		pc.commitAndClose();
 		return result;
 	}

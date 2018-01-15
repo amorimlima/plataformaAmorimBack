@@ -74,8 +74,8 @@ public class ProfessorFuncionario implements Serializable {
     @Column(name = "complemento")
     private String complemento;
     
-    @Column(name = "perfil")
-    private int perfil;
+//    @Column(name = "perfil")
+//    private int perfil;
     
     @Basic(optional = false)
     @Column(name = "cep")
@@ -111,6 +111,16 @@ public class ProfessorFuncionario implements Serializable {
     private String observacao;
     @Column(name = "foto_professor_funcionario")
     private String fotoProfessorFuncionario;
+    @Column(name = "email1")
+    private String email1;
+    @Column(name = "email2")
+    private String email2;
+    @Column(name = "telefoneResidencial")
+    private String telefoneResidencial;
+    @Column(name = "telefoneCelular")
+    private String telefoneCelular;
+    @Column(name = "jeiff")
+    private String jeiff;
     /*
     @JoinColumn(name = "perfil", referencedColumnName = "idperfil")
     @ManyToOne(optional = false)
@@ -118,7 +128,47 @@ public class ProfessorFuncionario implements Serializable {
     
    
     
-    @OneToMany(mappedBy = "professor")
+    public String getEmail1() {
+		return email1;
+	}
+
+	public void setEmail1(String email1) {
+		this.email1 = email1;
+	}
+
+	public String getEmail2() {
+		return email2;
+	}
+
+	public void setEmail2(String email2) {
+		this.email2 = email2;
+	}
+
+	public String getTelefoneResidencial() {
+		return telefoneResidencial;
+	}
+
+	public void setTelefoneResidencial(String telefoneResidencial) {
+		this.telefoneResidencial = telefoneResidencial;
+	}
+
+	public String getTelefoneCelular() {
+		return telefoneCelular;
+	}
+
+	public void setTelefoneCelular(String telefoneCelular) {
+		this.telefoneCelular = telefoneCelular;
+	}
+
+	public String getJeiff() {
+		return jeiff;
+	}
+
+	public void setJeiff(String jeiff) {
+		this.jeiff = jeiff;
+	}
+
+	@OneToMany(mappedBy = "professor")
     private Collection<RelatorioAluno> relatorioAlunoCollection;
     @OneToMany(mappedBy = "tutor")
     private Collection<Tutoria> tutoriaCollection;
@@ -362,13 +412,13 @@ public class ProfessorFuncionario implements Serializable {
         return "br.com.muranodesign.model.ProfessorFuncionario[ idprofessorFuncionario=" + idprofessorFuncionario + " ]";
     }
 
-	public int getPerfil() {
-		return perfil;
-	}
-
-	public void setPerfil(int perfil) {
-		this.perfil = perfil;
-	}
+//	public int getPerfil() {
+//		return perfil;
+//	}
+//
+//	public void setPerfil(int perfil) {
+//		this.perfil = perfil;
+//	}
 
 
 

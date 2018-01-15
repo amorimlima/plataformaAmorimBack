@@ -1,5 +1,6 @@
 package br.com.muranodesign.business;
 
+import java.util.Date;
 import java.util.List;
 
 import br.com.muranodesign.dao.DAOFactory;
@@ -85,32 +86,21 @@ public class PlanejamentoAulaService {
 		pc.commitAndClose();
 		return result;
 	}
-	
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public List<PlanejamentoAula> listarPlanoAula(int id){
+
+	public List<PlanejamentoAula> listarProfessorOficina(int idProfessor, int idOficina) {
 		PersistenceContext pc = DAOFactory.createPersistenceContext();
 		PlanejamentoAulaDAO dao = DAOFactory.getPlanejamentoAulaDAO(pc);
-		List<PlanejamentoAula> result = dao.listarPlanoAula(id);
+		List<PlanejamentoAula> result = dao.listarProfessorOficina(idProfessor, idOficina);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<PlanejamentoAula> listarIntervalo(Date inicio, Date fim, int idProfessor) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoAulaDAO dao = DAOFactory.getPlanejamentoAulaDAO(pc);
+		List<PlanejamentoAula> result = dao.listarIntervalo(inicio, fim, idProfessor);
 		pc.commitAndClose();
 		return result;
 	}
 	
-	/**
-	 * 
-	 * @param idProfessor
-	 * @param idObjetivoAula
-	 * @param idplanoAula
-	 * @return
-	 */
-	public List<PlanejamentoAula> listarProfessorObjetivoAula(int idProfessor, int idObjetivoAula, int idplanoAula){
-		PersistenceContext pc = DAOFactory.createPersistenceContext();
-		PlanejamentoAulaDAO dao = DAOFactory.getPlanejamentoAulaDAO(pc);
-		List<PlanejamentoAula> result = dao.listarProfessorObjetivoAula(idProfessor, idObjetivoAula, idplanoAula);
-		pc.commitAndClose();
-		return result;
-	}
 }

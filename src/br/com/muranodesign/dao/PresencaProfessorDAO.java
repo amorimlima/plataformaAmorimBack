@@ -58,6 +58,8 @@ public interface PresencaProfessorDAO {
 		
 		
 		public List<PresencaProfessor> listarFaltas(int id);
+
+		public List<PresencaProfessor> listarPresencas(Integer idprofessorFuncionario);
 	
 
 }

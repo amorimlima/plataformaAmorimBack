@@ -9,10 +9,12 @@
  */
 
 package br.com.muranodesign.dao.impl;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -23,6 +25,7 @@ import br.com.muranodesign.hibernate.AbstractHibernateDAO;
 import br.com.muranodesign.hibernate.HibernatePersistenceContext;
 import br.com.muranodesign.model.Aluno;
 import br.com.muranodesign.model.Chamada;
+import br.com.muranodesign.model.Compensacao;
 
 
 
@@ -66,6 +69,10 @@ public class ChamadaDAOImpl extends AbstractHibernateDAO implements ChamadaDAO {
 	public List<Chamada> listaPrecenca(Aluno aluno , int precenca) {
 		
 		Criteria criteria = getSession().createCriteria(Chamada.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.ge("data", cal.getTime()));
+		
 		short shortPrecenca;
 		shortPrecenca = (short) precenca;
 		
@@ -127,13 +134,29 @@ public class ChamadaDAOImpl extends AbstractHibernateDAO implements ChamadaDAO {
 	public long countFaltas(int id){
 		short t = 0;
 		Criteria criteria = getSession().createCriteria(Chamada.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.gt("data", cal.getTime()));
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", id));
-		criteria.add(Restrictions.eq("presenca",t ));
+		criteria.add(Restrictions.eq("presenca", t));
 		List<Chamada> result = criteria.list();
 		long r =  result.size();
-		return r;
-		
+		return r;	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public long countPresencas(int id){
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.gt("data", cal.getTime()));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", id));
+		criteria.add(Restrictions.eq("presenca", (short)1));
+		List<Chamada> result = criteria.list();
+		long r =  result.size();
+		return r;	
 	}
 
 	/*
@@ -173,6 +196,97 @@ public class ChamadaDAOImpl extends AbstractHibernateDAO implements ChamadaDAO {
 		
 	    
 		return result; 
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Chamada> getFaltasSemana(int idAluno, int dia, int mes) {
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		
+		Calendar primeiroDia = Calendar.getInstance();
+		primeiroDia.set(Calendar.MONTH, mes);
+		primeiroDia.set(Calendar.DATE, dia);
+		primeiroDia.set(Calendar.WEEK_OF_MONTH, primeiroDia.get(Calendar.WEEK_OF_MONTH));
+		primeiroDia.set(Calendar.DAY_OF_WEEK, primeiroDia.getFirstDayOfWeek());
+		Calendar ultimoDia =  Calendar.getInstance();
+		ultimoDia.set(Calendar.MONTH, mes);
+		ultimoDia.set(Calendar.DATE, primeiroDia.get(Calendar.DATE) + 6);
+		
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		
+		//criteria.add(Restrictions.eq("presenca", (short)0));
+		
+		criteria.add(Restrictions.ge("data", primeiroDia.getTime()));
+		criteria.add(Restrictions.le("data", ultimoDia.getTime()));
+		criteria.addOrder(Order.asc("data"));
+		
+		List<Chamada> result = criteria.list();
+		return result;
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Chamada> dataPresenca(int id, Calendar cal) {
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", id));
+		criteria.add(Restrictions.eq("data", cal.getTime()));
+		List<Chamada> result = criteria.list();
+		
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Chamada> listBetween(int idAluno, Date startDate, Date endDate) {
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		criteria.add(Restrictions.between("data", startDate, endDate));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		return criteria.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public long countFaltasAno(int idAluno, int ano) {
+		short t = 0;
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		Calendar calInicio = Calendar.getInstance();
+		calInicio.set(Calendar.YEAR, ano);
+		calInicio.set(Calendar.DAY_OF_YEAR, 1);
+		Calendar calFim = Calendar.getInstance();
+		calFim.set(Calendar.YEAR, ano);
+		calFim.set(Calendar.DAY_OF_YEAR, calFim.getActualMaximum(Calendar.DAY_OF_YEAR));
+		criteria.add(Restrictions.ge("data", calInicio.getTime()));
+		criteria.add(Restrictions.le("data", calFim.getTime()));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		criteria.add(Restrictions.eq("presenca",t ));
+		List<Chamada> result = criteria.list();
+		long r =  result.size();
+		return r;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Compensacao> compensacaoAluno(int idAluno) {
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		criteria.add(Restrictions.isNotNull("compensacao"));
+		criteria.setProjection(Projections.distinct(Projections.property("compensacao")));
+		return criteria.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public long countCompensacao(Integer idAluno) {
+		Criteria criteria = getSession().createCriteria(Chamada.class);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		criteria.add(Restrictions.gt("data", cal.getTime()));
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		criteria.add(Restrictions.eq("presenca", (short)3));
+		List<Chamada> result = criteria.list();
+		long r =  result.size();
+		return r;	
 	}
 
 }

@@ -9,9 +9,11 @@
  */
 
 package br.com.muranodesign.dao.impl;
+import java.util.Calendar;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import br.com.muranodesign.dao.ProducaoAlunoDAO;
@@ -100,6 +102,11 @@ public class ProducaoAlunoDAOImpl extends AbstractHibernateDAO implements Produc
 	@SuppressWarnings("unchecked")
 	public List<ProducaoAluno> listarFiltro(int id, int tipo, int roteiro){
 		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", id));
 		
@@ -123,6 +130,11 @@ public class ProducaoAlunoDAOImpl extends AbstractHibernateDAO implements Produc
 	@SuppressWarnings("unchecked")
 	public List<ProducaoAluno> listarAluno(int id){
 		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", id));
 		List<ProducaoAluno> result = criteria.list();
@@ -135,6 +147,11 @@ public class ProducaoAlunoDAOImpl extends AbstractHibernateDAO implements Produc
 	@SuppressWarnings("unchecked")
 	public List<ProducaoAluno> listarPortifolio(int id){
 		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", id));
 		criteria.createAlias("tipo", "tipo");
@@ -150,6 +167,11 @@ public class ProducaoAlunoDAOImpl extends AbstractHibernateDAO implements Produc
 	@SuppressWarnings("unchecked")
 	public List<ProducaoAluno> listaAlunoRoteiroTipo(int idAluno, int idRoteiro, int idTipo){
 		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
 		
@@ -177,11 +199,36 @@ public class ProducaoAlunoDAOImpl extends AbstractHibernateDAO implements Produc
 	@SuppressWarnings("unchecked")
 	public List<ProducaoAluno> listaOficinaAluno(int idOficina, int idAluno) {
 		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
 		
 		criteria.createAlias("oficina", "oficina");
 		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
+		
+		List<ProducaoAluno> result = criteria.list();
+		
+		return result;
+	}
+
+	@Override
+	public List<ProducaoAluno> listaUltimasAluno(int idAluno) {
+		Criteria criteria = getSession().createCriteria(ProducaoAluno.class);
+		
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		criteria.addOrder(Order.desc("data"));
+		criteria.addOrder(Order.desc("idproducaoAluno"));
+		
+		criteria.setMaxResults(8);
 		
 		List<ProducaoAluno> result = criteria.list();
 		

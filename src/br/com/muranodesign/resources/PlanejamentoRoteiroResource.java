@@ -13,6 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.apache.log4j.Logger;
 
 import br.com.muranodesign.business.AlunoService;
 import br.com.muranodesign.business.AlunoVariavelService;
+import br.com.muranodesign.business.AnoLetivoService;
 import br.com.muranodesign.business.AtribuicaoRoteiroExtraService;
 import br.com.muranodesign.business.GrupoService;
 import br.com.muranodesign.business.ObjetivoService;
@@ -240,6 +242,13 @@ public class PlanejamentoRoteiroResource {
 
 	}
 	
+	@Path("AlunoAno/{idAluno}/{ano}")
+	@GET
+	@Produces("application/json")
+	public List<PlanejamentoRoteiro> getAlunoAno(@PathParam("idAluno") int idAluno, @PathParam("ano") int ano){
+		return new PlanejamentoRoteiroService().listarAlunoAno(idAluno, ano);
+	}
+	
 	/**
 	 * Listar total 
 	 * @param id
@@ -254,7 +263,6 @@ public class PlanejamentoRoteiroResource {
 		
 		int total = 0;
 		for (PlanejamentoRoteiro planejamentoRoteiro : resultado) {
-			//if(planejamentoRoteiro.getObjetivo().getRoteiro().getAtivo() == 1 && planejamentoRoteiro.getObjetivo().getRoteiro().getAnoEstudo().getIdanoEstudo() == aluno.get(0).getAnoEstudo().getIdanoEstudo()){
 			if(planejamentoRoteiro.getObjetivo().getRoteiro().getAtivo() == 1 && planejamentoRoteiro.getObjetivo().getRoteiro().getAnoEstudo().equals(aluno.get(0).getAnoEstudo())){
 				
 				total++;	
@@ -479,6 +487,56 @@ public class PlanejamentoRoteiroResource {
 			return "false";
 		}
 
+	}
+	
+	@Path("Corrigir/")
+	@POST
+	@Produces("text/plain")
+	public String corrigir(@FormParam("planejamentos") String planejamentos){
+		
+		String [] arrayPlanejamentos = planejamentos.split(";");
+		for (String string : arrayPlanejamentos) {
+			PlanejamentoRoteiro r = new PlanejamentoRoteiroService().listarkey(Integer.parseInt(string)).get(0);
+			if (Integer.parseInt(r.getStatus()) == 2)
+			{
+				r.setStatus("3");
+				r.setDataStatusEntregue(new Date());
+				new PlanejamentoRoteiroService().atualizarPlanejamentoRoteiro(r);
+			}
+		}
+		
+		return "1";
+	}
+	
+	@Path("Rejeitar/")
+	@POST
+	@Produces("text/plain")
+	public String rejeitar(@FormParam("planejamentos") String planejamentos){
+		
+		String [] arrayPlanejamentos = planejamentos.split(";");
+		for (String string : arrayPlanejamentos) {
+			PlanejamentoRoteiro r = new PlanejamentoRoteiroService().listarkey(Integer.parseInt(string)).get(0);
+			if (Integer.parseInt(r.getStatus()) == 2)
+			{
+				r.setStatus("0");
+				new PlanejamentoRoteiroService().atualizarPlanejamentoRoteiro(r);
+			}
+		}
+		PlanejamentoRoteiro r = new PlanejamentoRoteiroService().listarkey(Integer.parseInt(arrayPlanejamentos[0])).get(0);
+		Calendar plan = Calendar.getInstance();
+		Calendar today = Calendar.getInstance();
+		plan.setTime(r.getDataStatusEntregue());
+		if(arrayPlanejamentos.length == new ObjetivoService().listarRoteiroTotal(r.getObjetivo().getRoteiro().getIdroteiro()) &&
+			plan.get(Calendar.YEAR) < today.get(Calendar.YEAR)){
+			AtribuicaoRoteiroExtra at = new AtribuicaoRoteiroExtra();
+			at.setAluno(new AlunoService().listarkey(r.getIdAluno()).get(0));
+			at.setAnoLetivo(new AnoLetivoService().listarAnoLetivo(Integer.toString(today.get(Calendar.YEAR))).get(0));
+			at.setMotivo("Roteiro não concluído no ano anterior");
+			at.setRoteiro(r.getObjetivo().getRoteiro());
+			new AtribuicaoRoteiroExtraService().criarRoteiroExtra(at);
+		}
+		
+		return "1";
 	}
 	
 	/**

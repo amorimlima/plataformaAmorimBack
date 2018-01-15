@@ -8,7 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -22,15 +23,21 @@ public class PendenciasProducaoAluno implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
-	@Column(name = "Idpendencias_producao_aluno")
+	@Column(name = "idpendencias_producao_aluno")
 	private int IdPendenciasProducaoAluno;
 	
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "aluno", referencedColumnName = "ID_ALUNO")
 	private Aluno aluno;
 	
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "roteiro", referencedColumnName = "idroteiro")
 	private Roteiro roteiro;
 	
+	@ManyToOne
+	@JoinColumn(name = "ano_letivo", referencedColumnName = "idano_letivo")
+	private AnoLetivo anoLetivo;
+
 	@Basic(optional = false)
 	@Column(name = "portfolio_completo")
 	private int portfolioCompleto;
@@ -65,6 +72,14 @@ public class PendenciasProducaoAluno implements Serializable{
 
 	public void setRoteiro(Roteiro roteiro) {
 		this.roteiro = roteiro;
+	}
+	
+	public AnoLetivo getAnoLetivo() {
+		return anoLetivo;
+	}
+
+	public void setAnoLetivo(AnoLetivo anoLetivo) {
+		this.anoLetivo = anoLetivo;
 	}
 
 	public int getPortfolioCompleto() {

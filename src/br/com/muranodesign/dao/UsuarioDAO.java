@@ -91,6 +91,8 @@ public interface UsuarioDAO {
 		 * @param id
 		 */
 		public void updateUser(String senha,int id);
+
+		public List<Usuario> listarPerfil(int idPerfil);
 		
 		
 		

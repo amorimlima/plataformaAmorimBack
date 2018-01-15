@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,8 +45,8 @@ public class Periodo implements Serializable {
     private Integer idperiodo;
     @Column(name = "periodo")
     private String periodo;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "periodo")
-    private Collection<AlunoVariavel> alunoVariavelCollection;
+    /*@OneToMany(cascade = CascadeType.ALL, mappedBy = "periodo")
+    private Collection<AlunoVariavel> alunoVariavelCollection;*/
     @OneToMany(mappedBy = "periodo")
     private Collection<Tutoria> tutoriaCollection;
     @OneToMany(mappedBy = "periodo")
@@ -76,14 +75,14 @@ public class Periodo implements Serializable {
         this.periodo = periodo;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<AlunoVariavel> getAlunoVariavelCollection() {
         return alunoVariavelCollection;
     }
 
     public void setAlunoVariavelCollection(Collection<AlunoVariavel> alunoVariavelCollection) {
         this.alunoVariavelCollection = alunoVariavelCollection;
-    }
+    }*/
 
     @XmlTransient
     public Collection<Tutoria> getTutoriaCollection() {

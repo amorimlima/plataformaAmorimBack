@@ -1,5 +1,5 @@
 /**
- *   Este codigo Ã© software livre vocÃª e pode resdistribuir e/ou modificar ele seguindo os termos da
+ *   Este codigo é software livre você e pode resdistribuir e/ou modificar ele seguindo os termos da
  *   Creative Commons Attribution 4.0 International Pare visualizar uma copia desta 
  *   licensa em ingles visite http://creativecommons.org/licenses/by/4.0/.
  *   
@@ -18,7 +18,7 @@ import javax.xml.bind.DatatypeConverter;
  *
  * @author Rogerio Lima dos Santos
  * @version 1.00
- * @since Release 1 da aplicaÃ§Ã£o
+ * @since Release 1 da aplicação
  */
 public class BasicAuth {
     /**

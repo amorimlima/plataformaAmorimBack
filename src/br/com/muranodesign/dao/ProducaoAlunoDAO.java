@@ -96,4 +96,6 @@ public interface ProducaoAlunoDAO {
 		public List<ProducaoAluno> NCapa(int id);
 
 		public List<ProducaoAluno> listaOficinaAluno(int idOficina, int idAluno);
+
+		public List<ProducaoAluno> listaUltimasAluno(int idAluno);
 }

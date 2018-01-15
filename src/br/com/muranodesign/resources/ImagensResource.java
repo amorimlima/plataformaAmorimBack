@@ -15,7 +15,11 @@ import br.com.muranodesign.business.ImagensService;
 import br.com.muranodesign.model.Imagens;
 import br.com.muranodesign.model.historicoEventos;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("Imagens")
 public class ImagensResource {
 	

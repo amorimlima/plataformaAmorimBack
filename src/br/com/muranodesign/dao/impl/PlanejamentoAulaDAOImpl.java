@@ -1,5 +1,6 @@
 package br.com.muranodesign.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -86,35 +87,31 @@ public class PlanejamentoAulaDAOImpl extends AbstractHibernateDAO implements Pla
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see br.com.muranodesign.dao.PlanejamentoAulaDAO#listarPlanoAula(int)
-	 */
 	@SuppressWarnings("unchecked")
-	public List<PlanejamentoAula> listarPlanoAula(int id){
+	public List<PlanejamentoAula> listarProfessorOficina(int idProfessor, int idOficina) {
 		Criteria criteria = getSession().createCriteria(PlanejamentoAula.class);
-		criteria.createAlias("planoAula", "planoAula");
-		criteria.add(Restrictions.eq("planoAula.Idplano_aula", id));
+		criteria.createAlias("professor", "professor");
+		criteria.add(Restrictions.eq("professor.idprofessorFuncionario", idProfessor));
+		criteria.createAlias("oficina", "oficina");
+		criteria.add(Restrictions.eq("oficina.Idoficina", idOficina));
+		List<PlanejamentoAula> result = criteria.list();
+		return result;
+	}
+
+	@Override
+	public List<PlanejamentoAula> listarIntervalo(Date inicio, Date fim,
+			int idProfessor) {
+		Criteria criteria = getSession().createCriteria(PlanejamentoAula.class);
+		criteria.createAlias("professor", "professor");
+		criteria.add(Restrictions.eq("professor.idprofessorFuncionario", idProfessor));
+		criteria.add(Restrictions.or((Restrictions.or(
+				Restrictions.between("data_inicio", inicio, fim),
+				Restrictions.between("data_fim", inicio, fim))),
+			Restrictions.and(Restrictions.lt("data_inicio", inicio),
+							 Restrictions.gt("data_fim", fim)))
+);
 		List<PlanejamentoAula> result = criteria.list();
 		return result;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see br.com.muranodesign.dao.PlanejamentoAulaDAO#listarProfessorObjetivoAula(int, int, int)
-	 */
-	@SuppressWarnings("unchecked")
-	public List<PlanejamentoAula> listarProfessorObjetivoAula(int idProfessor, int idObjetivoAula, int idplanoAula){
-		Criteria criteria = getSession().createCriteria(PlanejamentoAula.class);
-		criteria.createAlias("professor", "professor");
-		criteria.add(Restrictions.eq("professor.idprofessorFuncionario", idProfessor));
-		criteria.createAlias("objetivoAula", "objetivoAula");
-		criteria.add(Restrictions.eq("objetivoAula.Idobjetivo_aula", idObjetivoAula));
-		criteria.createAlias("planoAula", "planoAula");
-		criteria.add(Restrictions.eq("planoAula.Idplano_aula", idplanoAula));
-		
-		
-		List<PlanejamentoAula> result = criteria.list();
-		return result;
-	}
 }

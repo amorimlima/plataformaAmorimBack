@@ -33,6 +33,7 @@ import br.com.muranodesign.business.AnoLetivoService;
 import br.com.muranodesign.business.CategoriaProducaoAlunoService;
 import br.com.muranodesign.business.MensagensService;
 import br.com.muranodesign.business.OficinaService;
+import br.com.muranodesign.business.PendenciasProducaoAlunoService;
 import br.com.muranodesign.business.ProducaoAlunoService;
 import br.com.muranodesign.business.RoteiroService;
 import br.com.muranodesign.business.TipoProducaoAlunoService;
@@ -40,6 +41,7 @@ import br.com.muranodesign.model.Aluno;
 import br.com.muranodesign.model.AnoLetivo;
 import br.com.muranodesign.model.CategoriaProducaoAluno;
 import br.com.muranodesign.model.Oficina;
+import br.com.muranodesign.model.PendenciasProducaoAluno;
 import br.com.muranodesign.model.ProducaoAluno;
 import br.com.muranodesign.model.Roteiro;
 import br.com.muranodesign.model.TipoProducaoAluno;
@@ -111,10 +113,7 @@ public class ProducaoAlunoResource {
 	public List<ProducaoAluno> getalunoPortifolio(@PathParam("id") int id) throws ParseException {
 		logger.info("Lista ProducaoAluno  por id " + id);
 		List<ProducaoAluno> resultado;
-		resultado = new ProducaoAlunoService().listarPortifolio(id);
-		//PlanoEstudo evento = resultado.get(0);}
-        
-      
+		resultado = new ProducaoAlunoService().listarPortifolio(id);    
 		return resultado;
 
 	}
@@ -188,6 +187,27 @@ public class ProducaoAlunoResource {
 			return "false";
 		}
 
+	}
+	
+	@Path("DeletarProducaoAluno/{idaluno}/{idroteiro}/{tipoproducao}")
+	@GET
+	@Produces("text/plain")
+	public String removerProducaoAluno(@PathParam("idaluno") int idaluno, @PathParam("idroteiro") int idroteiro, @PathParam("tipoproducao") int tipoproducao){
+		
+		ProducaoAluno producaoAluno = new ProducaoAlunoService().listaAlunoRoteiroTipo(idaluno, idroteiro, tipoproducao).get(0);
+		
+		PendenciasProducaoAluno pendencias = new PendenciasProducaoAlunoService().listarAlunoRoteiro(idaluno, idroteiro).get(0);
+		
+		if (tipoproducao == 4)
+			pendencias.setFichaFinalizacaoCompleta(0);
+		else
+			pendencias.setPortfolioCompleto(0);
+		
+		new PendenciasProducaoAlunoService().atualizarPendenciasProducaoAluno(pendencias);
+		
+		new ProducaoAlunoService().deletarProducaoAluno(producaoAluno);
+		
+		return "deleteado";
 	}
 	
 	
@@ -272,6 +292,8 @@ public class ProducaoAlunoResource {
 		String anexo = "http://177.55.99.90/files/" + arquivo;
 
 		logger.info("anexo" + anexo);
+		if(prod.getCapa() != null)
+			upload.deleteFile(prod.getCapa());
 
 		prod.setCapa(anexo);
 		
@@ -315,6 +337,13 @@ public class ProducaoAlunoResource {
 		
 		return new ProducaoAlunoService().listarAluno(id);
 		
+	}
+	
+	@Path("AlunoUltimasPostagens/{idAluno}")
+	@GET
+	@Produces("application/json")
+	public List<ProducaoAluno> getUltimasProducoes(@PathParam("idAluno") int idAluno){
+		return new ProducaoAlunoService().listarUltimasAluno(idAluno);
 	}
 	
 	/**
@@ -418,7 +447,7 @@ public class ProducaoAlunoResource {
 		    if(t == 6 ){
 		    	objProducaoAluno.setArquivo(arquivo);
 		    }
-		    if(t < 5 ){
+		    if(t == 4 || t == 5){
 		    	objProducaoAluno.setRoteiro(objRoteiro);
 		    }
 		    objProducaoAluno.setCategoria(objCategoriaProducaoAluno);
@@ -446,7 +475,7 @@ public class ProducaoAlunoResource {
 			    if (t == 7){
 			    	objProducaoAluno.setOficina(objOficina);
 			    }
-			    if(t < 5 ){
+			    if(t == 4 || t == 5){
 			    	objProducaoAluno.setRoteiro(objRoteiro);
 			    }
 			    objProducaoAluno.setCategoria(objCategoriaProducaoAluno);
@@ -497,7 +526,7 @@ public class ProducaoAlunoResource {
 		Upload upload = new Upload (); 
 		upload.writeToFile(uploadedInputStream, uploadedFileLocation);
 		
-		logger.info("anexo" + anexo);     
+		logger.info("anexo" + anexo);  
 		
 		objProducaoAluno.setImagem(anexo);
 		
@@ -546,6 +575,8 @@ public class ProducaoAlunoResource {
 		
 		logger.info("anexo" + anexo);     
 		
+		if(objProducaoAluno.getArquivo() != null)
+			upload.deleteFile(objProducaoAluno.getArquivo());
 		objProducaoAluno.setArquivo(anexo);
 		
 		resultado =  new ProducaoAlunoService().atualizarProducaoAluno(objProducaoAluno);

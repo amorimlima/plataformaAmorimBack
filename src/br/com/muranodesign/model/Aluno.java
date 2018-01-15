@@ -270,12 +270,10 @@ public class Aluno implements Serializable {
     private String nome;
     
     /** The nome mae. */
-    @Basic(optional = false)
     @Column(name = "NOME_MAE")
     private String nomeMae;
     
     /** The nome pai. */
-    @Basic(optional = false)
     @Column(name = "NOME_PAI")
     private String nomePai;
     
@@ -413,12 +411,12 @@ public class Aluno implements Serializable {
     private Collection<RelatorioTutoria> relatorioTutoriaCollection;
     
     /** The relatorio aluno collection. */
-    @OneToMany(mappedBy = "aluno")
-    private Collection<RelatorioAluno> relatorioAlunoCollection;
+//    @OneToMany(mappedBy = "aluno")
+//    private Collection<RelatorioAluno> relatorioAlunoCollection;
     
     /** The aluno variavel collection. */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "aluno")
-    private Collection<AlunoVariavel> alunoVariavelCollection;
+    /*@OneToMany(cascade = CascadeType.ALL, mappedBy = "aluno")
+    private Collection<AlunoVariavel> alunoVariavelCollection;*/
     
     /** The plano estudo collection. */
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "aluno")
@@ -1753,43 +1751,43 @@ public class Aluno implements Serializable {
         this.relatorioTutoriaCollection = relatorioTutoriaCollection;
     }
 
-    /**
-     * Gets the relatorio aluno collection.
-     *
-     * @return the relatorio aluno collection
-     */
-    @XmlTransient
-    public Collection<RelatorioAluno> getRelatorioAlunoCollection() {
-        return relatorioAlunoCollection;
-    }
-
-    /**
-     * Sets the relatorio aluno collection.
-     *
-     * @param relatorioAlunoCollection the new relatorio aluno collection
-     */
-    public void setRelatorioAlunoCollection(Collection<RelatorioAluno> relatorioAlunoCollection) {
-        this.relatorioAlunoCollection = relatorioAlunoCollection;
-    }
+//    /**
+//     * Gets the relatorio aluno collection.
+//     *
+//     * @return the relatorio aluno collection
+//     */
+//    @XmlTransient
+//    public Collection<RelatorioAluno> getRelatorioAlunoCollection() {
+//        return relatorioAlunoCollection;
+//    }
+//
+//    /**
+//     * Sets the relatorio aluno collection.
+//     *
+//     * @param relatorioAlunoCollection the new relatorio aluno collection
+//     */
+//    public void setRelatorioAlunoCollection(Collection<RelatorioAluno> relatorioAlunoCollection) {
+//        this.relatorioAlunoCollection = relatorioAlunoCollection;
+//    }
 
     /**
      * Gets the aluno variavel collection.
      *
      * @return the aluno variavel collection
      */
-    @XmlTransient
+    /*@XmlTransient
     public Collection<AlunoVariavel> getAlunoVariavelCollection() {
         return alunoVariavelCollection;
-    }
+    }*/
 
     /**
      * Sets the aluno variavel collection.
      *
      * @param alunoVariavelCollection the new aluno variavel collection
      */
-    public void setAlunoVariavelCollection(Collection<AlunoVariavel> alunoVariavelCollection) {
+    /*public void setAlunoVariavelCollection(Collection<AlunoVariavel> alunoVariavelCollection) {
         this.alunoVariavelCollection = alunoVariavelCollection;
-    }
+    }*/
 
     /**
      * Gets the plano estudo collection.

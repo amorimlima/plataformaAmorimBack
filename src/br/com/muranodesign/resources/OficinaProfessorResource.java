@@ -1,5 +1,7 @@
 package br.com.muranodesign.resources;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -11,12 +13,20 @@ import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
 
+import br.com.muranodesign.business.AgendamentoSalaService;
 import br.com.muranodesign.business.OficinaProfessorService;
 import br.com.muranodesign.business.OficinaService;
 import br.com.muranodesign.business.ProfessorFuncionarioService;
+import br.com.muranodesign.business.RotinaService;
+import br.com.muranodesign.model.AgendamentoSala;
 import br.com.muranodesign.model.OficinaProfessor;
+import br.com.muranodesign.model.Rotina;
 
-
+/**
+ * 
+ * @author Kevyn
+ *
+ */
 @Path("OficinaProfessor")
 public class OficinaProfessorResource {
 
@@ -112,6 +122,52 @@ public class OficinaProfessorResource {
 	@Produces("application/json")
 	public List<OficinaProfessor> getlistarPorOficina(@PathParam("id") int id){
 		return new OficinaProfessorService().listarPorOficina(id);
+	}
+	
+	@Path("ListarOficineiros")
+	@GET
+	@Produces("application/json")
+	public List<ProfessorFuncionario> getOficineiros(){
+		return new OficinaProfessorService().listarOficineiros();
+	}
+	
+	@Path("ListarOficinaProfessorRotina/{idProfessor}")
+	@GET
+	@Produces("application/json")
+	public List<Object> getOficinaProfessorRotina(@PathParam("idProfessor") int idProfessor)
+	{
+			List<Object> resultado = new ArrayList<Object>();
+			
+			List<OficinaProfessor> oficinasProfessor = new OficinaProfessorService().listarProfessor(idProfessor);
+			for (OficinaProfessor oficinaProfessor : oficinasProfessor) {
+				int idOficina = oficinaProfessor.getOficina().getIdoficina();
+				List<Rotina> rotinaOficina = new RotinaService().listarPorOficina(idOficina);
+				if (!rotinaOficina.isEmpty())
+				{
+					Rotina rotinaOficinaProfessor = rotinaOficina.get(0);
+					List<ProfessorFuncionario> professores = new OficinaProfessorService().listarProfessoresPorOficina(idOficina);
+					List<AgendamentoSala> agendamento = new AgendamentoSalaService().listarRotina(rotinaOficinaProfessor.getIdrotina());
+					
+					Hashtable <String, Object> rotinaObj = new Hashtable<String, Object>();
+
+					if (!agendamento.isEmpty())
+					{
+						rotinaObj.put("sala", agendamento.get(0));
+						rotinaObj.put("rotina", rotinaOficinaProfessor);
+					}
+					else
+					{
+						rotinaObj.put("sala", "");
+						rotinaObj.put("rotina", rotinaOficinaProfessor);
+					}
+					rotinaObj.put("professores", professores);
+					
+					resultado.add(rotinaObj);
+				}
+				
+			}
+			
+			return resultado;
 	}
 	
 }

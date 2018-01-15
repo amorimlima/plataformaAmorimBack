@@ -101,9 +101,10 @@ public interface AlunoVariavelDAO {
 		 * Listar por ano e periodo
 		 * @param ano
 		 * @param periodo
+		 * @param anoLetivo 
 		 * @return
 		 */
-		public List<AlunoVariavel> listaAnoEstudoPeriodo(AnoEstudo ano, Periodo periodo);
+		public List<AlunoVariavel> listaAnoEstudoPeriodo(AnoEstudo ano, Periodo periodo, int anoLetivo);
 		
 		/**
 		 * Listar por ano e periodo e que tenha grupo
@@ -160,6 +161,43 @@ public interface AlunoVariavelDAO {
 		 * @return
 		 */
 		public List<AlunoVariavel> ListarRangePeriodo(int id, int primeiro,int ultimo);
+
+
+		public List<AlunoVariavel> ListarCicloAnoPeriodoSemGrupo(
+				List<Integer> anos, int idPeriodo, int primeiro, int ultimo);
+
+
+		public List<AlunoVariavel> ListarCicloAnoSemGrupo(List<Integer> anos,
+				int primeiro, int ultimo);
+
+
+		public List<AlunoVariavel> ListarRangePeriodoSemGrupo(int idPeriodo,
+				int primeiro, int ultimo);
+
+
+		public List<AlunoVariavel> ListarNomeSemGrupo(String nome, int idPeriodo, List<Integer> anos);
+
+
+		public List<AlunoVariavel> listarAlunoAno(int idAluno, int ano);
+
+
+		public List<AlunoVariavel> listaAlunoTodos(int idAluno);
+
+
+		public List<AlunoVariavel> listarNomeAluno(String like);
+
+
+		public AlunoVariavel listarAtivosAno(int ano, int i);
+
+
+		public List<AlunoVariavel> listaAlunoInativo(int idAluno);
+
+
+		public List<AlunoVariavel> listarRelatorioSecretaria(int tutoria,
+				int ano, int periodo, String neces, String prog, String status);
+
+
+		public List<AlunoVariavel> listaTutoria(int id);
 		
 		
 }

@@ -242,5 +242,61 @@ public class PlanejamentoRoteiroService {
 		pc.commitAndClose();
 		return p;
 	}
+
+	public List<PlanejamentoRoteiro> listarAlunoCompletosLista(int idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		List<PlanejamentoRoteiro> result = dao.listarAlunoCompletosLista(idAluno);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<PlanejamentoRoteiro> listarAlunoCorrigidosLista(int idAluno) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		List<PlanejamentoRoteiro> result = dao.listarAlunoCorrigidosLista(idAluno);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<PlanejamentoRoteiro> listarAlunoAno(int idAluno, int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		List<PlanejamentoRoteiro> result = dao.listarAlunoAno(idAluno, ano);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public List<PlanejamentoRoteiro> countRoteiroCompletos(Integer idroteiro, int idAluno, int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		List<PlanejamentoRoteiro> result = dao.countRoteiroCompletos(idroteiro, idAluno, ano);
+		pc.commitAndClose();
+		return result;
+	}
+	
+	public List<PlanejamentoRoteiro> countRoteiroCorrigidos(Integer idroteiro, int idAluno, int ano) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		List<PlanejamentoRoteiro> result = dao.countRoteiroCorrigidos(idroteiro, idAluno, ano);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public float countCompletosTutoria(int idTutoria) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		float result = dao.countCompletosTutoria(idTutoria);
+		pc.commitAndClose();
+		return result;
+	}
+
+	public float countCorrigidosTutoria(int idTutoria) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		PlanejamentoRoteiroDAO dao = DAOFactory.getPlanejamentoRoteiroDAO(pc);
+		float result = dao.countCorrigidosTutoria(idTutoria);
+		pc.commitAndClose();
+		return result;
+	}
 	
 }

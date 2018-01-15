@@ -20,9 +20,9 @@ public class NativeQueryService {
 		
 		NativeQueryDAO dao = DAOFactory.getNativeQueryDAO(pc);
 		//List<ProdUser> result = dao.listarUser(user);
-		//pc.commitAndClose();
-		
 		List <Object[]> list = dao.listAll(query);
+		pc.commitAndClose();
+		
 		return list;
 	}
 	

@@ -9,7 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -26,56 +27,36 @@ public class PlanejamentoAula  implements Serializable{
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 @Basic(optional = false)
 	 @Column(name = "Idplanejamento_aula")
-	 private int Idplanejamento_aula;
+	 private Integer Idplanejamento_aula;
 	 
-	 @Basic(optional = false)
-	 @Column(name = "data")
+	 @JoinColumn (name = "oficina", referencedColumnName = "Idoficina")
+	 @ManyToOne
+	 private Oficina oficina;
+	 
+	 @Column(name = "data_inicio")
 	 @Temporal(TemporalType.DATE)
-	 private Date data;
+	 private Date data_inicio;
 	 
-	 @OneToOne
-	 private PlanoAula planoAula;
+	 @Column(name = "data_fim")
+	 @Temporal(TemporalType.DATE)
+	 private Date data_fim;
 	 
-	 @OneToOne
-	 private ObjetivoAula objetivoAula;
-
-	 @OneToOne
+	 @Column(name = "objetivo")
+	 private String objetivo;
+	 
+	 @Column(name = "conteudo")
+	 private String conteudo;
+	 
+	 @Column(name = "metodologia")
+	 private String metodologia;
+	 
+	 @Column(name = "atividades")
+	 private String atividades;
+	 
+	 @JoinColumn(name = "professor", referencedColumnName = "idprofessor_funcionario")
+	 @ManyToOne
 	 private ProfessorFuncionario professor;
 	 
-	 @Column(name = "status")
-	 private String status;
-
-	public int getIdplanejamento_aula() {
-		return Idplanejamento_aula;
-	}
-
-	public void setIdplanejamento_aula(int idplanejamento_aula) {
-		Idplanejamento_aula = idplanejamento_aula;
-	}
-
-	public Date getData() {
-		return data;
-	}
-
-	public void setData(Date data) {
-		this.data = data;
-	}
-
-	public PlanoAula getPlanoAula() {
-		return planoAula;
-	}
-
-	public void setPlanoAula(PlanoAula planoAula) {
-		this.planoAula = planoAula;
-	}
-
-	public ObjetivoAula getObjetivoAula() {
-		return objetivoAula;
-	}
-
-	public void setObjetivoAula(ObjetivoAula objetivoAula) {
-		this.objetivoAula = objetivoAula;
-	}
 
 	public ProfessorFuncionario getProfessor() {
 		return professor;
@@ -85,19 +66,69 @@ public class PlanejamentoAula  implements Serializable{
 		this.professor = professor;
 	}
 
-	public String getStatus() {
-		return status;
+	public int getIdplanejamento_aula() {
+		return Idplanejamento_aula;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setIdplanejamento_aula(int idplanejamento_aula) {
+		Idplanejamento_aula = idplanejamento_aula;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public Oficina getOficina() {
+		return oficina;
 	}
-	 
-	 
+
+	public void setOficina(Oficina oficina) {
+		this.oficina = oficina;
+	}
+
+	public Date getData_inicio() {
+		return data_inicio;
+	}
+
+	public void setData_inicio(Date data_ini) {
+		this.data_inicio = data_ini;
+	}
+
+	public Date getData_fim() {
+		return data_fim;
+	}
+
+	public void setData_fim(Date data_fim) {
+		this.data_fim = data_fim;
+	}
+
+	public String getObjetivo() {
+		return objetivo;
+	}
+
+	public void setObjetivo(String objetivo) {
+		this.objetivo = objetivo;
+	}
+
+	public String getConteudo() {
+		return conteudo;
+	}
+
+	public void setConteudo(String conteudo) {
+		this.conteudo = conteudo;
+	}
+
+	public String getMetodologia() {
+		return metodologia;
+	}
+
+	public void setMetodologia(String metodologia) {
+		this.metodologia = metodologia;
+	}
+
+	public String getAtividades() {
+		return atividades;
+	}
+
+	public void setAtividades(String atividades) {
+		this.atividades = atividades;
+	}
 
 }
 

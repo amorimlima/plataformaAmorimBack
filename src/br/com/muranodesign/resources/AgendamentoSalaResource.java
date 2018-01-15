@@ -65,40 +65,19 @@ public class AgendamentoSalaResource {
 		}
 		else if(action.equals("create")){
 			AgendamentoSala agendamento = new AgendamentoSala();
-			
-			if(idrotina != 0){
-				
-				Rotina rotina = new RotinaService().listarkey(idrotina).get(0);
-				
-				List<AgendamentoSala> validacao = new AgendamentoSalaService().listarValidacao(rotina.getDia().getIdsemana(), idsala, rotina.getHora());
-				
-				if(!validacao.isEmpty()){
-					return "ERRO: Horario indisponivel";
-				}
-				
-				
-				agendamento.setRotina(new RotinaService().listarkey(idrotina).get(0));
-				agendamento.setSala(new SalasService().listarkey(idsala).get(0));
-				
-				resultado = new AgendamentoSalaService().criarAgendamentoSala(agendamento);
-			}else{
-			
-				List<AgendamentoSala> validacao = new AgendamentoSalaService().listarValidacao(iddia, idsala, hora);
-				
-				if(!validacao.isEmpty()){
-					return "ERRO: Horario indisponivel";
-				}
-				
-				agendamento.setDia(new SemanaService().listarkey(iddia).get(0));
-				agendamento.setHora(hora);
-				agendamento.setOutra(outra);
-				
-				agendamento.setSala(new SalasService().listarkey(idsala).get(0));
-				
-				resultado = new AgendamentoSalaService().criarAgendamentoSala(agendamento);
+			agendamento.setHora(Hora);
+			agendamento.setDia(new SemanaService().listarkey(iddia).get(0));
+			agendamento.setRotina(new RotinaService().listarkey(idrotina).get(0));
+			agendamento.setSala(new SalasService().listarkey(idsala).get(0));
+			if (id != 0)
+			{
+				agendamento.setIdagendamento_sala(id);
+				new AgendamentoSalaService().atualizarAgendamentoSala(agendamento);
 			}
-			
-		}else if(action.equals("update")){
+			else
+				new AgendamentoSalaService().criarAgendamentoSala(agendamento);
+		}
+		else if(action.equals("update")){
 			AgendamentoSala agendamento = new AgendamentoSalaService().listarkey(id).get(0);
 			
 			if(idrotina != 0){
@@ -167,6 +146,19 @@ public class AgendamentoSalaResource {
 		 resultado = new AgendamentoSalaService().listarTodos();
 		 logger.debug("QTD AgendamentoSala : " +  resultado.size());
 		return resultado;
+	}
+	
+	@GET
+	@Path("ListarRotina/{idRotina}")
+	@Produces("application/json")
+	public AgendamentoSala listarRotina(@PathParam("idRotina") int idRotina){
+		
+		try{
+			return new AgendamentoSalaService().listarRotina(idRotina).get(0);
+		}
+		catch (Exception e){
+			return new AgendamentoSala();
+		}
 	}
 
 }

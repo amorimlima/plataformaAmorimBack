@@ -1,6 +1,7 @@
 package br.com.muranodesign.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -8,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -31,10 +33,11 @@ public class Agrupamento  implements Serializable{
 	 @OneToOne
 	 private AnoLetivo anoLetivo;
 	 
-	 //Alteração que pode mudar
 	 @OneToOne
 	 private Ciclos ciclo;
-	 //Alteração que pode mudar
+	 
+	 @OneToMany(mappedBy = "agrupamento")
+	 private List<AlunoAgrupamento> alunos;
 	 
 	public int getIdagrupamento() {
 		return Idagrupamento;

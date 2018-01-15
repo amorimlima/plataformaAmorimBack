@@ -113,4 +113,12 @@ public class AlunoAgrupamentoService {
 		return result;
 	}
 
+	public List<AlunoAgrupamento> listarLikeAluno(String nome) {
+		PersistenceContext pc = DAOFactory.createPersistenceContext();
+		AlunoAgrupamentoDAO dao = DAOFactory.getAlunoAgrupamentoDAO(pc);
+		List<AlunoAgrupamento> result = dao.listarLikeAluno(nome);
+		pc.commitAndClose();
+		return result;
+	}
+
 }

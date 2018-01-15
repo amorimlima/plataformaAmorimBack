@@ -1,5 +1,6 @@
 package br.com.muranodesign.dao.impl;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -58,6 +59,20 @@ public class PendenciasProducaoAlunoDAOImpl extends AbstractHibernateDAO impleme
 	@SuppressWarnings("unchecked")
 	public List<PendenciasProducaoAluno> listarAluno(int id) {
 		Criteria criteria = getSession().createCriteria(PendenciasProducaoAluno.class);
+		
+		criteria.createAlias("aluno", "aluno");
+		criteria.add(Restrictions.eq("aluno.idAluno", id));
+		List<PendenciasProducaoAluno> resultado = criteria.list();
+		return resultado;
+	}
+	
+	public List<PendenciasProducaoAluno> listarAlunoAnoAnterior(int id) {
+		Criteria criteria = getSession().createCriteria(PendenciasProducaoAluno.class);
+
+		String ano = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.ne("anoLetivo.ano", ano));
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.add(Restrictions.eq("aluno.idAluno", id));
 		List<PendenciasProducaoAluno> resultado = criteria.list();
@@ -67,10 +82,26 @@ public class PendenciasProducaoAlunoDAOImpl extends AbstractHibernateDAO impleme
 	@SuppressWarnings("unchecked")
 	public List<PendenciasProducaoAluno> listarAlunoRoteiro(int idaluno, int idroteiro) {
 		Criteria criteria = getSession().createCriteria(PendenciasProducaoAluno.class);
+		
 		criteria.createAlias("aluno", "aluno");
 		criteria.createAlias("roteiro", "roteiro");
 		criteria.add(Restrictions.eq("aluno.idAluno", idaluno));
 		criteria.add(Restrictions.eq("roteiro.idroteiro", idroteiro));
+		List<PendenciasProducaoAluno> resultado = criteria.list();
+		return resultado;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<PendenciasProducaoAluno> listarAlunoRoteiroAno(int idAluno, int idRoteiro, String ano){
+		Criteria criteria = getSession().createCriteria(PendenciasProducaoAluno.class);
+		
+		criteria.createAlias("anoLetivo", "anoLetivo");
+		criteria.add(Restrictions.eq("anoLetivo.ano", ano));
+		
+		criteria.createAlias("aluno", "aluno");
+		criteria.createAlias("roteiro", "roteiro");
+		criteria.add(Restrictions.eq("aluno.idAluno", idAluno));
+		criteria.add(Restrictions.eq("roteiro.idroteiro", idRoteiro));
 		List<PendenciasProducaoAluno> resultado = criteria.list();
 		return resultado;
 	}

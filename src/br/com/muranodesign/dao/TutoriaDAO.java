@@ -101,4 +101,6 @@ public interface TutoriaDAO {
 		 */
 		public List<Tutoria> listarDadosPertinentes();
 
+		public List<Tutoria> listarTodasAnos();
+
 }
